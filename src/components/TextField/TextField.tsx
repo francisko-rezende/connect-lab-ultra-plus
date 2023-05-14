@@ -22,12 +22,6 @@ export function TextField({
         {label}
       </Label>
       {children}
-      {/* <input
-        id="confirmPassword"
-        type="password"
-        className="w-full rounded-md border border-gray-200 placeholder:text-gray-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500"
-        {...register("confirmPassword")}
-      /> */}
       {hasError && <ErrorText>{errorMessage}</ErrorText>}
     </div>
   );
