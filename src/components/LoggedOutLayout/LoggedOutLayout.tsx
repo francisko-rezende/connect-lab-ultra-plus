@@ -9,7 +9,7 @@ type LoggedOutLayoutProps = {
 export function LoggedOutLayout({ children }: LoggedOutLayoutProps) {
   return (
     <main
-      className={`grid h-full w-full items-center bg-neutral-100 px-2 ${inter.className} overflow-auto py-7`}
+      className={`grid h-full w-full items-center bg-blue-50 px-2 ${inter.className} overflow-auto py-7`}
     >
       {children}
     </main>
