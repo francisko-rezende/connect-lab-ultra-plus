@@ -7,9 +7,7 @@ type InputProps = ComponentProps<"input"> & {
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
   ({ type, id, hasError, ...props }: InputProps, ref) => {
-    const errorStyles = hasError
-      ? "border-rose-200 placeholder:text-rose-400"
-      : "";
+    const errorStyles = hasError ? "input-error" : "";
 
     return (
       <input

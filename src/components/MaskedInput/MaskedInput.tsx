@@ -12,9 +12,7 @@ type MaskedInputProps = {
 export const MaskedInput = forwardRef<IMask.MaskElement, MaskedInputProps>(
   ({ onChange, name, hasError, ...props }: MaskedInputProps, inputRef) => {
     const ref = useRef();
-    const errorStyles = hasError
-      ? "border-rose-200 placeholder:text-rose-300 text-rose-500"
-      : "";
+    const errorStyles = hasError ? "input-error" : "";
 
     return (
       <IMaskInput
