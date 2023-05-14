@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "type-check:watch": "tsc -w --project tsconfig.json"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.1.0",
