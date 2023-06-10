@@ -3,6 +3,7 @@ module.exports = {
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/templates/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/layouts/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
@@ -24,6 +25,9 @@ module.exports = {
           950: '#000000'
         },
       },
+      gridTemplateColumns: {
+        overview: 'repeat(auto-fill, minmax(min(446px, 100%), 1fr))'
+      }
     },
   },
   plugins: [require('@tailwindcss/forms')],
