@@ -1,6 +1,6 @@
 import { ReactElement } from "react";
 import type { NextPageWithLayout } from "./_app";
-import { LoggedOutLayout } from "@/components/LoggedOutLayout";
+import { LoggedOutLayout } from "@/layouts/LoggedOutLayout";
 import { SignUp } from "@/templates/SignUp";
 
 const SignUpPage: NextPageWithLayout = () => {
