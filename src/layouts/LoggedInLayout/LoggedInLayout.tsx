@@ -1,0 +1,65 @@
+import { Inter } from "next/font/google";
+import Link from "next/link";
+import { useRouter } from "next/router";
+
+const inter = Inter({ subsets: ["latin"] });
+
+type LoggedInLayoutProps = {
+  children: React.ReactNode;
+};
+
+export function LoggedInLayout({ children }: LoggedInLayoutProps) {
+  const { pathname } = useRouter();
+  const getLinkClasses = (linkHref: string) =>
+    pathname === linkHref
+      ? "font-semibold text-blue-700"
+      : "font-medium text-stone-700";
+
+  return (
+    <div
+      className={`${inter.className} grid h-full grid-cols-[1fr_3fr] grid-rows-[auto_1fr] 2xl:grid-cols-[390px_1fr]`}
+    >
+      <header className="relative z-10 col-span-2 px-16 py-9 shadow-lg">
+        <Link href="/">
+          {" "}
+          <h1 className="inline text-2xl font-semibold uppercase">
+            Connect Lab
+          </h1>
+        </Link>
+      </header>
+      <nav className="relative z-0 col-span-1 h-full max-w-[390px] content-baseline bg-gray-50 pl-16 pr-6 pt-12">
+        <h2 className="mb-20 text-xl font-semibold">Empresa XYZ</h2>
+        <h3 className="-ml-8 mb-10 uppercase text-gray-500">Menu</h3>
+        <ul className="grid gap-10">
+          <li>
+            <Link className={getLinkClasses("/")} href="/">
+              Overview
+            </Link>
+          </li>
+          <li>
+            <Link className={getLinkClasses("/sensores")} href="/sensores">
+              Sensores
+            </Link>
+          </li>
+          <li>
+            <Link className={getLinkClasses("/locais")} href="/locais">
+              Locais
+            </Link>
+          </li>
+          <li>
+            <Link
+              className={getLinkClasses("/configuracoes")}
+              href="/configuracoes"
+            >
+              Configurações
+            </Link>
+          </li>
+        </ul>
+        <button className="absolute bottom-24">Logout</button>
+      </nav>
+      <main className={`col-span-1 h-full w-full overflow-auto px-8 py-12`}>
+        {children}
+      </main>
+    </div>
+  );
+}
