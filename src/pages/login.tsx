@@ -1,9 +1,10 @@
 import { ReactElement } from "react";
 import type { NextPageWithLayout } from "./_app";
 import { LoggedOutLayout } from "@/layouts/LoggedOutLayout";
+import { SignIn } from "@/templates/SignIn";
 
 const Page: NextPageWithLayout = () => {
-  return <h1>Login</h1>;
+  return <SignIn />;
 };
 
 Page.getLayout = function getLayout(page: ReactElement) {
