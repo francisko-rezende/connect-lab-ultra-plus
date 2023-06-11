@@ -31,4 +31,14 @@ export const schemas = {
       message: "As senhas precisam ser iguais",
       path: ["confirmPassword"],
     }),
+  signIn: z.object({
+    email: z
+      .string()
+      .nonempty(errorMessages.required)
+      .email(errorMessages.invalidEmail),
+    password: z
+      .string()
+      .nonempty(errorMessages.required)
+      .min(8, errorMessages.passwordTooShort),
+  }),
 };
