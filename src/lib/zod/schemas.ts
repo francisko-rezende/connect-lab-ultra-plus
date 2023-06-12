@@ -41,4 +41,62 @@ export const schemas = {
       .nonempty(errorMessages.required)
       .min(8, errorMessages.passwordTooShort),
   }),
+  editProfile: z
+    .object({
+      company: z.string().nonempty(errorMessages.required),
+      cnpj: z
+        .string()
+        .nonempty(errorMessages.required)
+        .refine((value) => isCNPJ(value), errorMessages.invalidCNPJ)
+        .transform((value) => value.replace(/\D/g, "")),
+      owner: z.string().nonempty(errorMessages.required),
+      email: z
+        .string()
+        .nonempty(errorMessages.required)
+        .email(errorMessages.invalidEmail),
+      phone: z
+        .string()
+        .refine(
+          (value) => isPhone(value) || value === undefined,
+          errorMessages.invalidPhone
+        )
+        .transform((value) => value.replace(/\D/g, ""))
+        .optional(),
+      password: z
+        .string()
+        .min(8, errorMessages.passwordTooShort)
+        .or(z.literal("")),
+      confirmPassword: z.string(),
+    })
+    .refine(
+      (data) => {
+        const hasEnteredPassword = !!data.password;
+        const hasEnteredConfirmPassword = !!data.confirmPassword;
+        const shouldMakeConfirmPasswordRequired =
+          hasEnteredPassword && !hasEnteredConfirmPassword;
+
+        return shouldMakeConfirmPasswordRequired ? false : true;
+      },
+      {
+        message: "Campo obrigatório",
+        path: ["confirmPassword"],
+      }
+    )
+    .refine(
+      (data) => {
+        const hasEnteredPassword = !!data.password;
+        const hasEnteredConfirmPassword = !!data.confirmPassword;
+        const hasEnteredBothPasswords =
+          hasEnteredPassword && hasEnteredConfirmPassword;
+
+        if (hasEnteredBothPasswords) {
+          return data.password === data.confirmPassword;
+        }
+        return true;
+      },
+      {
+        message: "As senhas precisam ser iguais",
+        path: ["confirmPassword"],
+      }
+    ),
 };
