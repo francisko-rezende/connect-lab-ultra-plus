@@ -1,9 +1,10 @@
 import { ReactElement } from "react";
 import type { NextPageWithLayout } from "./_app";
 import { LoggedInLayout } from "@/layouts/LoggedInLayout";
+import { Configuration } from "@/templates/Configuration";
 
 const Page: NextPageWithLayout = () => {
-  return <h1>Configurações</h1>;
+  return <Configuration />;
 };
 
 Page.getLayout = function getLayout(page: ReactElement) {
