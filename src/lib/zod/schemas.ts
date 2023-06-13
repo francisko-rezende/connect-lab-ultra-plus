@@ -43,17 +43,18 @@ export const schemas = {
   }),
   editProfile: z
     .object({
-      company: z.string().nonempty(errorMessages.required),
+      company: z.string().or(z.literal("")),
       cnpj: z
         .string()
-        .nonempty(errorMessages.required)
         .refine((value) => isCNPJ(value), errorMessages.invalidCNPJ)
-        .transform((value) => value.replace(/\D/g, "")),
-      owner: z.string().nonempty(errorMessages.required),
+        .transform((value) => value.replace(/\D/g, ""))
+        .or(z.literal("")),
+      owner: z.string().or(z.literal("")),
       email: z
         .string()
-        .nonempty(errorMessages.required)
-        .email(errorMessages.invalidEmail),
+
+        .email(errorMessages.invalidEmail)
+        .or(z.literal("")),
       phone: z
         .string()
         .refine(
@@ -61,7 +62,7 @@ export const schemas = {
           errorMessages.invalidPhone
         )
         .transform((value) => value.replace(/\D/g, ""))
-        .optional(),
+        .or(z.literal("")),
       password: z
         .string()
         .min(8, errorMessages.passwordTooShort)
