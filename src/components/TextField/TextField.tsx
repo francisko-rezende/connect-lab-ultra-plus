@@ -42,7 +42,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         id={id}
         ref={ref}
         className={twMerge(
-          "w-full rounded-md border border-gray-200 placeholder:text-gray-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500",
+          "w-full rounded-md border border-gray-200 placeholder:text-gray-400 read-only:bg-gray-100 read-only:text-gray-600 focus:border-brand-500 focus:ring-2 focus:ring-brand-500",
           errorStyles
         )}
         {...props}
@@ -71,7 +71,7 @@ const MaskedInput = forwardRef<IMask.MaskElement, MaskedInputProps>(
         {...props}
         inputRef={ref}
         className={twMerge(
-          "w-full rounded-md border border-gray-200 placeholder:text-gray-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500",
+          "w-full rounded-md border border-gray-200 placeholder:text-gray-400 read-only:bg-gray-100 read-only:text-gray-600 focus:border-brand-500 focus:ring-2 focus:ring-brand-500",
           errorStyles
         )}
         onAccept={(value: string) => {
