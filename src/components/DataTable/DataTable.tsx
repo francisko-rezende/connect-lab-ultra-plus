@@ -61,9 +61,9 @@ export function DataTable<TData, TValue>({
           />
         </svg>
         <input
-          className="max-w-[440px] flex-1 rounded border-none pl-8"
+          className="max-w-[350px] flex-1 rounded border-none pl-8"
           type="search"
-          placeholder="Digite para filtrar os dados pelo nome do sensor..."
+          placeholder="Digite para filtrar os dados pelo nome..."
           value={table.getState().globalFilter}
           onChange={(e) => table.setGlobalFilter(e.target.value)}
         />
