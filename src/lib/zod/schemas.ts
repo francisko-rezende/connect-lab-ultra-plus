@@ -100,4 +100,45 @@ export const schemas = {
         path: ["confirmPassword"],
       }
     ),
+  linkSensor: z.object({
+    deviceId: z
+      .string()
+      .nonempty(errorMessages.required)
+      .transform((value) => parseInt(value)),
+    deviceName: z.string().nonempty(errorMessages.required),
+    macAddress: z
+      .string()
+      .refine((value) => {
+        const macAddressRegex = /^([0-9A-Fa-f]{2}[:]){5}([0-9A-Fa-f]{2})$/;
+
+        return macAddressRegex.test(value);
+      }, errorMessages.invalidMACAddress)
+      .transform((value) => value.replace(/\D/g, "")),
+    status: z
+      .enum(["true", "false"], {
+        errorMap: () => ({ message: errorMessages.required }),
+      })
+      .transform((value) => (value === "true" ? true : false)),
+  }),
+  createLocation: z.object({
+    locationName: z.string().nonempty(errorMessages.required),
+    latitude: z
+      .string()
+      .nonempty(errorMessages.required)
+      .refine((value) => {
+        const valueAsFloat = parseFloat(value);
+        const isSmallerThan90 = valueAsFloat <= 90.0;
+        const isLargerThanNegative90 = valueAsFloat >= -90.0;
+        return isSmallerThan90 && isLargerThanNegative90;
+      }, errorMessages.outOfRange.latitude),
+    longitude: z
+      .string()
+      .nonempty(errorMessages.required)
+      .refine((value) => {
+        const valueAsFloat = parseFloat(value);
+        const isSmallerThan180 = valueAsFloat <= 180.0;
+        const isLargerThanNegative180 = valueAsFloat >= -180.0;
+        return isSmallerThan180 && isLargerThanNegative180;
+      }, errorMessages.outOfRange.longitude),
+  }),
 };
