@@ -42,15 +42,15 @@ export function Configuration() {
         </TextField>
         <TextField
           label={"Responsável"}
-          htmlFor={"owner"}
-          errorMessage={errors["owner"]?.message}
+          htmlFor={"responsible"}
+          errorMessage={errors["responsible"]?.message}
         >
           <TextField.Input
-            id="owner"
+            id="responsible"
             type="text"
             readOnly
-            hasError={!!errors["owner"]}
-            {...register("owner")}
+            hasError={!!errors["responsible"]}
+            {...register("responsible")}
           />
         </TextField>
 
