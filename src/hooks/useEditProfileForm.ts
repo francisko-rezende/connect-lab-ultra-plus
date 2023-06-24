@@ -7,12 +7,13 @@ export default function useEditProfileForm() {
   const defaultValues = {
     company: "",
     cnpj: "",
-    owner: "",
+    responsible: "",
     email: "",
     phone: "",
     password: "",
     confirmPassword: "",
   };
+
   const {
     register,
     handleSubmit,
