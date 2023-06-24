@@ -1,18 +1,19 @@
 import { TextField } from "@/components/TextField";
 import { schemas } from "@/lib/zod/schemas";
 import { SignUpForm } from "@/types/signUpForm";
+import { trpc } from "@/utils/trpc";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 
 export function useSignUpForm() {
   const defaultValues = {
-    company: undefined,
-    cnpj: undefined,
-    phone: undefined,
-    owner: undefined,
-    email: undefined,
-    password: undefined,
-    passwordConfirmation: undefined,
+    company: '',
+    cnpj: '',
+    phone: '',
+    responsible: '',
+    email: '',
+    password: '',
+    passwordConfirmation: '',
   };
 
   const {
@@ -24,8 +25,10 @@ export function useSignUpForm() {
     defaultValues,
   });
 
+  const mutation = trpc.signUp.useMutation();
+
   const handleEditForm: SubmitHandler<SignUpForm> = (data) => {
-    console.log(data);
+    mutation.mutate(data);
   };
 
   const onSubmit = handleSubmit(handleEditForm);
@@ -49,7 +52,7 @@ export function useSignUpForm() {
     {
       isFullWidth: true,
       hasMask: false,
-      id: "owner",
+      id: "responsible",
       label: "Responsável",
       placeholder: "Joana Silva",
     },
