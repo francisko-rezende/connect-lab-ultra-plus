@@ -11,7 +11,7 @@ export const schemas = {
         .nonempty(errorMessages.required)
         .refine((value) => isCNPJ(value), errorMessages.invalidCNPJ)
         .transform((value) => value.replace(/\D/g, "")),
-      owner: z.string().nonempty(errorMessages.required),
+      responsible: z.string().nonempty(errorMessages.required),
       email: z
         .string()
         .nonempty(errorMessages.required)
@@ -49,7 +49,7 @@ export const schemas = {
         .refine((value) => isCNPJ(value), errorMessages.invalidCNPJ)
         .transform((value) => value.replace(/\D/g, ""))
         .or(z.literal("")),
-      owner: z.string().or(z.literal("")),
+      responsible: z.string().or(z.literal("")),
       email: z
         .string()
 
