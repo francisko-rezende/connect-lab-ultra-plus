@@ -2,5 +2,10 @@
   "extends": [
     "next/core-web-vitals",
     "prettier"
-  ]
+  ],
+  "rules": {
+    "react/no-unknown-property": [
+      1
+    ]
+  }
 }

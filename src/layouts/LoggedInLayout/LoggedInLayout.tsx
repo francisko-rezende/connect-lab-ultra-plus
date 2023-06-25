@@ -1,3 +1,4 @@
+import { TextField } from "@/components/TextField";
 import { Inter } from "next/font/google";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -15,17 +16,41 @@ export function LoggedInLayout({ children }: LoggedInLayoutProps) {
       ? "font-semibold text-blue-700"
       : "font-medium text-stone-700";
 
+  const locations = [
+    {
+      value: "1",
+      label: "Campo de soja",
+    },
+    {
+      value: "2",
+      label: "Campo de milho",
+    },
+    {
+      value: "3",
+      label: "Campo de abóbora",
+    },
+  ];
+
   return (
     <div
       className={`${inter.className} grid h-full grid-cols-[1fr_3fr] grid-rows-[auto_1fr] 2xl:grid-cols-[390px_1fr]`}
     >
       <header className="relative z-10 col-span-2 px-16 py-9 shadow-lg">
-        <Link href="/">
-          {" "}
-          <h1 className="inline text-2xl font-semibold uppercase">
-            Connect Lab
-          </h1>
-        </Link>
+        <div className="flex max-w-[1373px] items-center justify-between gap-4">
+          <Link href="/">
+            {" "}
+            <h1 className="inline text-2xl font-semibold uppercase">
+              Connect Lab
+            </h1>
+          </Link>
+          <TextField.Select hasError={false} className="w-auto">
+            {locations.map(({ label, value }) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
+          </TextField.Select>
+        </div>
       </header>
       <nav className="relative z-0 col-span-1 h-full max-w-[390px] content-baseline bg-gray-50 pl-16 pr-6 pt-12">
         <h2 className="mb-20 text-xl font-semibold">Empresa XYZ</h2>
