@@ -89,7 +89,7 @@ type SelectProps = ComponentProps<"select"> & {
 };
 
 const Select = forwardRef<HTMLSelectElement, SelectProps>(
-  ({ hasError, children, ...props }: SelectProps, ref) => {
+  ({ hasError, children, className, ...props }: SelectProps, ref) => {
     const errorStyles = hasError
       ? "border-rose-200 text-rose-500 placeholder:text-rose-300"
       : "";
@@ -99,7 +99,8 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
         ref={ref}
         className={twMerge(
           "w-full rounded-md border border-gray-200  placeholder:text-gray-400   invalid:text-red-500 focus:border-brand-500 focus:ring-2 focus:ring-brand-500",
-          errorStyles
+          errorStyles,
+          className
         )}
         {...props}
       >
