@@ -1,6 +1,3 @@
-import { ReactElement } from "react";
-import type { NextPageWithLayout } from "./_app";
-import { LoggedInLayout } from "@/layouts/LoggedInLayout";
 import { SectionTitle } from "@/components/SectionTitle/SectionTitle";
 import { Map } from "@/components/Map";
 import { Card } from "@/components/Card";
@@ -10,63 +7,63 @@ import { CardSubtitle } from "@/components/CardSubtitle/CardSubtitle";
 import { CardValue } from "@/components/CardValue";
 import { StatItem } from "@/components/StatItem";
 
-const mockTemperatureData: LineChartProps["data"] = [
-  { date: new Date(), measurement: 25 },
-  {
-    date: new Date(new Date().getTime() + 24 * 60 * 60 * 1000),
-    measurement: 20,
-  },
-  {
-    date: new Date(new Date().getTime() + 2 * 24 * 60 * 60 * 1000),
-    measurement: 18,
-  },
-  {
-    date: new Date(new Date().getTime() + 3 * 24 * 60 * 60 * 1000),
-    measurement: 22,
-  },
-  {
-    date: new Date(new Date().getTime() + 4 * 24 * 60 * 60 * 1000),
-    measurement: 26,
-  },
-  {
-    date: new Date(new Date().getTime() + 5 * 24 * 60 * 60 * 1000),
-    measurement: 23,
-  },
-  {
-    date: new Date(new Date().getTime() + 6 * 24 * 60 * 60 * 1000),
-    measurement: 28,
-  },
-];
+export function Overview() {
+  const mockTemperatureData: LineChartProps["data"] = [
+    { date: new Date(), measurement: 25 },
+    {
+      date: new Date(new Date().getTime() + 24 * 60 * 60 * 1000),
+      measurement: 20,
+    },
+    {
+      date: new Date(new Date().getTime() + 2 * 24 * 60 * 60 * 1000),
+      measurement: 18,
+    },
+    {
+      date: new Date(new Date().getTime() + 3 * 24 * 60 * 60 * 1000),
+      measurement: 22,
+    },
+    {
+      date: new Date(new Date().getTime() + 4 * 24 * 60 * 60 * 1000),
+      measurement: 26,
+    },
+    {
+      date: new Date(new Date().getTime() + 5 * 24 * 60 * 60 * 1000),
+      measurement: 23,
+    },
+    {
+      date: new Date(new Date().getTime() + 6 * 24 * 60 * 60 * 1000),
+      measurement: 28,
+    },
+  ];
 
-const mockMoistureData: LineChartProps["data"] = [
-  { date: new Date(), measurement: 62 },
-  {
-    date: new Date(new Date().getTime() + 24 * 60 * 60 * 1000),
-    measurement: 47,
-  },
-  {
-    date: new Date(new Date().getTime() + 2 * 24 * 60 * 60 * 1000),
-    measurement: 32,
-  },
-  {
-    date: new Date(new Date().getTime() + 3 * 24 * 60 * 60 * 1000),
-    measurement: 55,
-  },
-  {
-    date: new Date(new Date().getTime() + 4 * 24 * 60 * 60 * 1000),
-    measurement: 70,
-  },
-  {
-    date: new Date(new Date().getTime() + 5 * 24 * 60 * 60 * 1000),
-    measurement: 42,
-  },
-  {
-    date: new Date(new Date().getTime() + 6 * 24 * 60 * 60 * 1000),
-    measurement: 65,
-  },
-];
+  const mockMoistureData: LineChartProps["data"] = [
+    { date: new Date(), measurement: 62 },
+    {
+      date: new Date(new Date().getTime() + 24 * 60 * 60 * 1000),
+      measurement: 47,
+    },
+    {
+      date: new Date(new Date().getTime() + 2 * 24 * 60 * 60 * 1000),
+      measurement: 32,
+    },
+    {
+      date: new Date(new Date().getTime() + 3 * 24 * 60 * 60 * 1000),
+      measurement: 55,
+    },
+    {
+      date: new Date(new Date().getTime() + 4 * 24 * 60 * 60 * 1000),
+      measurement: 70,
+    },
+    {
+      date: new Date(new Date().getTime() + 5 * 24 * 60 * 60 * 1000),
+      measurement: 42,
+    },
+    {
+      date: new Date(new Date().getTime() + 6 * 24 * 60 * 60 * 1000),
+      measurement: 65,
+    },
+  ];
 
-const Page: NextPageWithLayout = () => {
   const stats = [
     {
       type: "temperature",
@@ -120,10 +117,4 @@ const Page: NextPageWithLayout = () => {
       </section>
     </>
   );
-};
-
-Page.getLayout = function getLayout(page: ReactElement) {
-  return <LoggedInLayout>{page}</LoggedInLayout>;
-};
-
-export default Page;
+}
