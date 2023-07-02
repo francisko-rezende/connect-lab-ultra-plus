@@ -3,7 +3,7 @@ import { useSignUpForm } from "@/hooks/useSignUpForm";
 import Link from "next/link";
 
 export function SignUp() {
-  const { fields, onSubmit, renderFields } = useSignUpForm();
+  const { fields, onSubmit, renderFields, isLoading } = useSignUpForm();
 
   return (
     <div className="mx-auto w-full max-w-[480px]">
@@ -19,7 +19,7 @@ export function SignUp() {
           <div className="grid grid-cols-2 items-start gap-x-2 gap-y-5">
             {fields.filter(({ isFullWidth }) => !isFullWidth).map(renderFields)}
           </div>
-          <Button type="submit" variant="primary" className="mt-9">
+          <Button isLoading={isLoading} type="submit" variant="primary" className="mt-9">
             Criar conta
           </Button>
         </form>

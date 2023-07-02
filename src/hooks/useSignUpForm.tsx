@@ -3,7 +3,9 @@ import { schemas } from "@/lib/zod/schemas";
 import { SignUpForm } from "@/types/signUpForm";
 import { trpc } from "@/utils/trpc";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/router";
 import { SubmitHandler, useForm } from "react-hook-form";
+import { toast } from "react-hot-toast";
 
 export function useSignUpForm() {
   const defaultValues = {
@@ -19,19 +21,54 @@ export function useSignUpForm() {
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors },
   } = useForm<SignUpForm>({
     resolver: zodResolver(schemas.signUp),
     defaultValues,
   });
+  const router = useRouter()
 
-  const mutation = trpc.signUp.useMutation();
+  const mutation = trpc.signUp.useMutation({
+    onError: error => {
+      const hasConflict = error.data?.code === 'CONFLICT'
 
-  const handleEditForm: SubmitHandler<SignUpForm> = (data) => {
-    mutation.mutate(data);
+      if (hasConflict) {
+        setError('cnpj', { message: 'O CNPJ informado já foi cadastrado no nosso banco de dados. Por favor, confira o CNPJ e tente novamente.' })
+        return
+      }
+    },
+    onSuccess: () => {
+      setTimeout(() => router.push('/login'), 3000)
+    }
+
+  });
+
+  const handleCreateAccount: SubmitHandler<SignUpForm> = (data) => {
+    toast.promise(
+      mutation.mutateAsync(data),
+      {
+        loading: 'Processando...',
+        success: 'Conta criada!',
+        error: 'Houve um erro na criação da conta',
+      },
+      {
+        style: {
+          minWidth: '250px',
+        },
+        success: {
+          duration: 5000,
+          icon: '✅',
+        },
+        error: {
+          duration: 5000,
+          icon: '❌',
+        },
+      }
+    );
   };
 
-  const onSubmit = handleSubmit(handleEditForm);
+  const onSubmit = handleSubmit(handleCreateAccount);
 
   const fields = [
     {
@@ -129,5 +166,6 @@ export function useSignUpForm() {
     fields,
     onSubmit,
     renderFields,
+    isLoading: mutation.isLoading,
   };
 }

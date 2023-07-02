@@ -12,7 +12,7 @@ const buttonStyles = cva(
     "transition-colors",
     "disabled:bg-neutral-400",
     "disabled:cursor-not-allowed",
-    "border",
+    "disabled:border-neutral-400",
   ],
   {
     variants: {
@@ -46,16 +46,18 @@ const buttonStyles = cva(
 export type ButtonProps = ComponentProps<"button"> &
   VariantProps<typeof buttonStyles> & {
     variant: Required<VariantProps<typeof buttonStyles>["variant"]>;
+    isLoading: boolean
   };
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, children, upperCase, ...props }: ButtonProps, ref) => (
+  ({ className, variant, children, upperCase, isLoading, ...props }: ButtonProps, ref) => (
     <button
       ref={ref}
       className={twMerge(buttonStyles({ variant, upperCase }), className)}
+      disabled={isLoading}
       {...props}
     >
-      {children}
+      {isLoading ? 'Loading...' : children}
     </button>
   )
 );
