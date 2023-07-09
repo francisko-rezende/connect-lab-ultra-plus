@@ -32,6 +32,7 @@
     "imask": "^6.6.1",
     "leaflet": "^1.9.4",
     "leaflet-defaulticon-compatibility": "^0.1.1",
+    "lucide-react": "^0.259.0",
     "next": "13.4.1",
     "next-auth": "^4.22.1",
     "postcss": "8.4.23",
@@ -48,12 +49,12 @@
     "zod": "^3.21.4"
   },
   "devDependencies": {
+    "@types/bcrypt": "^5.0.0",
     "@types/leaflet": "^1.9.3",
     "@types/react-text-mask": "^5.4.11",
     "eslint-config-prettier": "^8.8.0",
     "prettier": "2.8.8",
     "prettier-plugin-tailwindcss": "^0.2.8",
-    "prisma": "^4.15.0",
-    "@types/bcrypt": "^5.0.0"
+    "prisma": "^4.15.0"
   }
 }
