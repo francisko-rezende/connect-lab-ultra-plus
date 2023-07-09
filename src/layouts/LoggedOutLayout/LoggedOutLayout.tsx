@@ -15,7 +15,7 @@ export function LoggedOutLayout({ children }: LoggedOutLayoutProps) {
       >
         {children}
       </main>
-      <Toaster />
+      <Toaster position="bottom-center" />
     </>
   );
 }
