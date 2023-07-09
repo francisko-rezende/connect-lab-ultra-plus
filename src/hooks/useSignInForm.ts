@@ -42,13 +42,12 @@ export function useSignInForm() {
   const signInMutation = useMutation({
     mutationFn: async (data: SignInForm) => {
       setResponseError("");
-      return signIn("credentials", {
+      const response = await signIn("credentials", {
         ...data,
         redirect: false,
       });
-    },
-    onSuccess: (data) => {
-      if (data?.status === 401) {
+
+      if (response?.status === 401) {
         setResponseError("Usuário e/ou senha incorretos");
         return;
       }
