@@ -4,10 +4,10 @@ import { twMerge } from "tailwind-merge";
 
 const buttonStyles = cva(
   [
-    "w-full",
+    "px-10",
     "rounded-md",
-    "py-3",
-    "text-lg",
+    "py-2",
+    "border",
     "font-semibold ",
     "transition-colors",
     "disabled:bg-neutral-400",
@@ -32,6 +32,11 @@ const buttonStyles = cva(
           "text-slate-500",
           "border-slate-500",
         ],
+        noBorder: [
+          "text-stone-900",
+          "hover:text-stone-600",
+          "border-transparent",
+        ],
       },
       upperCase: {
         true: "uppercase",
@@ -46,18 +51,28 @@ const buttonStyles = cva(
 export type ButtonProps = ComponentProps<"button"> &
   VariantProps<typeof buttonStyles> & {
     variant: Required<VariantProps<typeof buttonStyles>["variant"]>;
-    isLoading: boolean
+    isLoading?: boolean;
   };
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, children, upperCase, isLoading, ...props }: ButtonProps, ref) => (
+  (
+    {
+      className,
+      variant,
+      children,
+      upperCase,
+      isLoading,
+      ...props
+    }: ButtonProps,
+    ref
+  ) => (
     <button
       ref={ref}
       className={twMerge(buttonStyles({ variant, upperCase }), className)}
       disabled={isLoading}
       {...props}
     >
-      {isLoading ? 'Loading...' : children}
+      {isLoading ? "Loading..." : children}
     </button>
   )
 );
