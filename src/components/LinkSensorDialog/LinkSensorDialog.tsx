@@ -6,7 +6,11 @@ import { LinkSensorForm } from "@/types/LinkSensorForm";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { schemas } from "@/lib/zod/schemas";
 
-export function LinkSensorDialog() {
+type LinkSensorDialogProps = {
+  trigger: React.ReactNode;
+};
+
+export function LinkSensorDialog({ trigger }: LinkSensorDialogProps) {
   const mockSensors = [
     {
       value: "1",
@@ -62,7 +66,7 @@ export function LinkSensorDialog() {
     <Dialog
       title="Vincular Sensor"
       subtitle="Vincular um novo sensor ao local."
-      trigger={<button>Abrir</button>}
+      trigger={trigger}
     >
       <form className="grid gap-4" onSubmit={onSubmit}>
         <TextField

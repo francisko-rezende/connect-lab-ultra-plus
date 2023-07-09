@@ -6,7 +6,11 @@ import { TextField } from "../TextField";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { schemas } from "@/lib/zod/schemas";
 
-export function CreateLocationDialog() {
+type CreateLocationDialogProps = {
+  trigger: React.ReactNode;
+};
+
+export function CreateLocationDialog({ trigger }: CreateLocationDialogProps) {
   const defaultValues = {
     locationName: "",
     latitude: "",
@@ -31,7 +35,7 @@ export function CreateLocationDialog() {
     <Dialog
       title="Criar Local"
       subtitle="Adicionar um novo local à empresa."
-      trigger={<button>Abrir</button>}
+      trigger={trigger}
     >
       <form className="grid gap-4" onSubmit={onSubmit}>
         <TextField
