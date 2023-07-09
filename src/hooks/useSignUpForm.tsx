@@ -31,10 +31,17 @@ export function useSignUpForm() {
 
   const mutation = trpc.signUp.useMutation({
     onError: error => {
-      const hasConflict = error.data?.code === 'CONFLICT'
+      const isCNPJinTheDb = error.message === 'Conflict: CNPJ must be unique but already exists in the database.'
 
-      if (hasConflict) {
+      if (isCNPJinTheDb) {
         setError('cnpj', { message: 'O CNPJ informado já foi cadastrado no nosso banco de dados. Por favor, confira o CNPJ e tente novamente.' })
+        return
+      }
+
+      const isEmailInTheDb = error.message === 'Conflict: Email must be unique but already exists in the database.'
+
+      if (isEmailInTheDb) {
+        setError('email', { message: 'O Email informado já foi cadastrado no nosso banco de dados. Por favor, confira o email e tente novamente.' })
         return
       }
     },
