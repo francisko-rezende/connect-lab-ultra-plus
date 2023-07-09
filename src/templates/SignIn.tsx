@@ -1,10 +1,12 @@
 import { Button } from "@/components/Button";
+import { ErrorText } from "@/components/ErrorText";
 import { TextField } from "@/components/TextField";
 import { useSignInForm } from "@/hooks/useSignInForm";
 import Link from "next/link";
 
 export function SignIn() {
-  const { errors, fields, onSubmit, register } = useSignInForm();
+  const { errors, fields, onSubmit, register, isLoading, responseError } =
+    useSignInForm();
 
   return (
     <div className="mx-auto w-full max-w-[480px]">
@@ -35,7 +37,15 @@ export function SignIn() {
               </TextField>
             );
           })}
-          <Button type="submit" variant="primary" className="mt-9">
+          {responseError && (
+            <ErrorText className="text-center">{responseError}</ErrorText>
+          )}
+          <Button
+            isLoading={isLoading}
+            type="submit"
+            variant="primary"
+            className="mt-9"
+          >
             Entrar
           </Button>
         </form>
