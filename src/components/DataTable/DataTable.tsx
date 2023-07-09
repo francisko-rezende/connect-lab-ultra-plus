@@ -48,16 +48,16 @@ export function DataTable<TData, TValue>({
             cy="11.5"
             r="6.5"
             stroke="#9395A3"
-            stroke-width="1.5"
-            stroke-linecap="round"
-            stroke-linejoin="round"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
           />
           <path
             d="M15.519 16.485 19.043 20"
             stroke="#9395A3"
-            stroke-width="1.5"
-            stroke-linecap="round"
-            stroke-linejoin="round"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
           />
         </svg>
         <input
