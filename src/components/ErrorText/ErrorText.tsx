@@ -1,7 +1,8 @@
 import { ComponentProps } from "react";
+import { twMerge } from "tailwind-merge";
 
-type ErrorTextProps = ComponentProps<"p">;
+type ErrorTextProps = ComponentProps<"p">
 
-export function ErrorText({ children }: ErrorTextProps) {
-  return <p className="text-sm text-rose-500">{children}</p>;
+export function ErrorText({ children, className }: ErrorTextProps) {
+  return <p className={twMerge("text-sm text-rose-500", className)}>{children}</p>;
 }

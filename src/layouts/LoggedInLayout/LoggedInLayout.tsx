@@ -1,4 +1,8 @@
 import { TextField } from "@/components/TextField";
+import { trpc } from "@/utils/trpc";
+import { GetServerSidePropsContext } from "next";
+import { getServerSession } from "next-auth";
+import { signOut, useSession } from "next-auth/react";
 import { Inter } from "next/font/google";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -10,9 +14,12 @@ type LoggedInLayoutProps = {
 };
 
 export function LoggedInLayout({ children }: LoggedInLayoutProps) {
-  const { pathname } = useRouter();
+  const router = useRouter();
+  const loggedInCompanyQuery = trpc.me.useQuery();
+  const { data } = loggedInCompanyQuery;
+
   const getLinkClasses = (linkHref: string) =>
-    pathname === linkHref
+    router.pathname === linkHref
       ? "font-semibold text-blue-700"
       : "font-medium text-stone-700";
 
@@ -53,7 +60,7 @@ export function LoggedInLayout({ children }: LoggedInLayoutProps) {
         </div>
       </header>
       <nav className="relative z-0 col-span-1 h-full max-w-[390px] content-baseline bg-gray-50 pl-16 pr-6 pt-12">
-        <h2 className="mb-20 text-xl font-semibold">Empresa XYZ</h2>
+        <h2 className="mb-20 text-xl font-semibold">{data?.company}</h2>
         <h3 className="-ml-8 mb-10 uppercase text-gray-500">Menu</h3>
         <ul className="grid gap-10">
           <li>
@@ -80,7 +87,18 @@ export function LoggedInLayout({ children }: LoggedInLayoutProps) {
             </Link>
           </li>
         </ul>
-        <button className="absolute bottom-24">Logout</button>
+        <a
+          className="absolute bottom-24 cursor-pointer"
+          onClick={async () => {
+            const data = await signOut({
+              redirect: false,
+              callbackUrl: "/login",
+            });
+            router.push(data.url);
+          }}
+        >
+          Logout
+        </a>
       </nav>
       <main className={`col-span-1 h-full w-full overflow-auto px-8 py-12`}>
         {children}

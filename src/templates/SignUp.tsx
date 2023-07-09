@@ -19,7 +19,12 @@ export function SignUp() {
           <div className="grid grid-cols-2 items-start gap-x-2 gap-y-5">
             {fields.filter(({ isFullWidth }) => !isFullWidth).map(renderFields)}
           </div>
-          <Button isLoading={isLoading} type="submit" variant="primary" className="mt-9">
+          <Button
+            isLoading={isLoading}
+            type="submit"
+            variant="primary"
+            className="mt-9"
+          >
             Criar conta
           </Button>
         </form>

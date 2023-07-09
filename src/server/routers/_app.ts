@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { procedure, router } from "../trpc";
+import { authedProcedure, procedure, router } from "../trpc";
 import { schemas } from "@/lib/zod/schemas";
 import { prisma } from "@/lib/prisma/prismaClient";
 import * as bcrypt from "bcrypt";
@@ -26,11 +26,24 @@ export const appRouter = router({
     if (hasCNPJBeenUsed) {
       throw new TRPCError({
         code: "CONFLICT",
-        message: "Conflict: CNPJ already exists in the database.",
+        message:
+          "Conflict: CNPJ must be unique but already exists in the database.",
       });
     }
 
-    const salt = await bcrypt.genSalt(14);
+    const hasEmailBeenUsed = await prisma.company.findFirst({
+      where: { email },
+    });
+
+    if (hasEmailBeenUsed) {
+      throw new TRPCError({
+        code: "CONFLICT",
+        message:
+          "Conflict: Email must be unique but already exists in the database.",
+      });
+    }
+
+    const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
     const newCompanyData = {
@@ -47,6 +60,20 @@ export const appRouter = router({
 
     return newCompany;
   }),
+  me: authedProcedure.query(({ ctx }) => {
+    // console.log({ctx});
+    // console.log(ctx);
+    const loggedInCompany = prisma.company.findFirst({
+      where: {
+        email: ctx.session?.user?.email!,
+      },
+    });
+
+    return loggedInCompany;
+  }),
+  // test: procedure.query(({ ctx }) => {
+  //   console.log(ctx);
+  // }),
 });
 
 // export type definition of API

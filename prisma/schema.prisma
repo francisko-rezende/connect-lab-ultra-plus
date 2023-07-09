@@ -13,9 +13,9 @@ datasource db {
 model Company {
   companyId   Int      @id @default(autoincrement())
   company     String
-  cnpj        String
+  cnpj        String   @unique
   responsible String
-  email       String
+  email       String   @unique
   phone       String
   password    String
   salt        String
