@@ -60,7 +60,7 @@ export function LoggedInLayout({ children }: LoggedInLayoutProps) {
         </div>
       </header>
       <nav className="relative z-0 col-span-1 h-full max-w-[390px] content-baseline bg-gray-50 pl-16 pr-6 pt-12">
-        <h2 className="mb-20 text-xl font-semibold">{data?.company}</h2>
+        <h2 className="mb-20 text-xl font-semibold">{data?.companyName}</h2>
         <h3 className="-ml-8 mb-10 uppercase text-gray-500">Menu</h3>
         <ul className="grid gap-10">
           <li>

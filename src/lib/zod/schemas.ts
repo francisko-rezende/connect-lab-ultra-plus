@@ -5,7 +5,7 @@ import { errorMessages } from "./errorMessages";
 export const schemas = {
   signUp: z
     .object({
-      company: z.string().nonempty(errorMessages.required),
+      companyName: z.string().nonempty(errorMessages.required),
       cnpj: z
         .string()
         .nonempty(errorMessages.required)

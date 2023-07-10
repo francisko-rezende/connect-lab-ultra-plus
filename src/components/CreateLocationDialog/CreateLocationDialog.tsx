@@ -5,6 +5,7 @@ import { CreateLocationForm } from "@/types/CreateLocationForm";
 import { TextField } from "../TextField";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { schemas } from "@/lib/zod/schemas";
+import { trpc } from "@/utils/trpc";
 
 type CreateLocationDialogProps = {
   trigger: React.ReactNode;
@@ -26,8 +27,10 @@ export function CreateLocationDialog({ trigger }: CreateLocationDialogProps) {
     resolver: zodResolver(schemas.createLocation),
   });
 
+  const mutation = trpc.createLocation.useMutation();
+
   const handleCreateLocation: SubmitHandler<CreateLocationForm> = (data) =>
-    console.log(data);
+    mutation.mutate(data);
 
   const onSubmit = handleSubmit(handleCreateLocation);
 

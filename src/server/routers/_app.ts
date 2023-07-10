@@ -6,20 +6,9 @@ import * as bcrypt from "bcrypt";
 import { TRPCError } from "@trpc/server";
 
 export const appRouter = router({
-  hello: procedure
-    .input(
-      z.object({
-        text: z.string(),
-      })
-    )
-    .query((opts) => {
-      return {
-        greeting: `hello ${opts.input.text}`,
-      };
-    }),
   signUp: procedure.input(schemas.signUp).mutation(async (opts) => {
     const { input } = opts;
-    const { cnpj, company, password, email, phone, responsible } = input;
+    const { cnpj, companyName, password, email, phone, responsible } = input;
 
     const hasCNPJBeenUsed = await prisma.company.findFirst({ where: { cnpj } });
 
@@ -48,7 +37,7 @@ export const appRouter = router({
 
     const newCompanyData = {
       cnpj,
-      company,
+      companyName,
       password: hashedPassword,
       email,
       phone,
@@ -61,8 +50,6 @@ export const appRouter = router({
     return newCompany;
   }),
   me: authedProcedure.query(({ ctx }) => {
-    // console.log({ctx});
-    // console.log(ctx);
     const loggedInCompany = prisma.company.findFirst({
       where: {
         email: ctx.session?.user?.email!,
@@ -71,10 +58,29 @@ export const appRouter = router({
 
     return loggedInCompany;
   }),
-  // test: procedure.query(({ ctx }) => {
-  //   console.log(ctx);
-  // }),
+  createLocation: authedProcedure
+    .input(schemas.createLocation)
+    .mutation(async ({ input, ctx }) => {
+      const company = await prisma.company.findFirst({
+        where: { email: ctx.session?.user?.email! },
+      });
+
+      if (!company) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Bad request: Logged in company not found.",
+        });
+      }
+
+      const newLocationData = {
+        ...input,
+        companyId: company.companyId,
+      };
+
+      const newLocation = prisma.location.create({ data: newLocationData });
+
+      return newLocation;
+    }),
 });
 
-// export type definition of API
 export type AppRouter = typeof appRouter;

@@ -23,8 +23,8 @@ export default async function handler(
     return;
   }
 
-  const { companyId, company, email: savedEmail } = companyData;
+  const { companyId, companyName, email: savedEmail } = companyData;
   return res
     .status(200)
-    .json({ id: companyId, name: company, email: savedEmail });
+    .json({ id: companyId, name: companyName, email: savedEmail });
 }
