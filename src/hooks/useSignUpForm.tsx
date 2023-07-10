@@ -9,13 +9,13 @@ import { toast } from "react-hot-toast";
 
 export function useSignUpForm() {
   const defaultValues = {
-    company: '',
-    cnpj: '',
-    phone: '',
-    responsible: '',
-    email: '',
-    password: '',
-    passwordConfirmation: '',
+    company: "",
+    cnpj: "",
+    phone: "",
+    responsible: "",
+    email: "",
+    password: "",
+    passwordConfirmation: "",
   };
 
   const {
@@ -27,49 +27,58 @@ export function useSignUpForm() {
     resolver: zodResolver(schemas.signUp),
     defaultValues,
   });
-  const router = useRouter()
+  const router = useRouter();
 
   const mutation = trpc.signUp.useMutation({
-    onError: error => {
-      const isCNPJinTheDb = error.message === 'Conflict: CNPJ must be unique but already exists in the database.'
+    onError: (error) => {
+      const isCNPJinTheDb =
+        error.message ===
+        "Conflict: CNPJ must be unique but already exists in the database.";
 
       if (isCNPJinTheDb) {
-        setError('cnpj', { message: 'O CNPJ informado já foi cadastrado no nosso banco de dados. Por favor, confira o CNPJ e tente novamente.' })
-        return
+        setError("cnpj", {
+          message:
+            "O CNPJ informado já foi cadastrado no nosso banco de dados. Por favor, confira o CNPJ e tente novamente.",
+        });
+        return;
       }
 
-      const isEmailInTheDb = error.message === 'Conflict: Email must be unique but already exists in the database.'
+      const isEmailInTheDb =
+        error.message ===
+        "Conflict: Email must be unique but already exists in the database.";
 
       if (isEmailInTheDb) {
-        setError('email', { message: 'O Email informado já foi cadastrado no nosso banco de dados. Por favor, confira o email e tente novamente.' })
-        return
+        setError("email", {
+          message:
+            "O Email informado já foi cadastrado no nosso banco de dados. Por favor, confira o email e tente novamente.",
+        });
+        return;
       }
     },
     onSuccess: () => {
-      setTimeout(() => router.push('/login'), 3000)
-    }
-
+      setTimeout(() => router.push("/login"), 3000);
+    },
   });
 
   const handleCreateAccount: SubmitHandler<SignUpForm> = (data) => {
     toast.promise(
       mutation.mutateAsync(data),
       {
-        loading: 'Processando...',
-        success: 'Conta criada!',
-        error: 'Houve um erro na criação da conta',
+        loading: "Processando...",
+        success: "Conta criada!",
+        error: "Houve um erro na criação da conta",
       },
       {
         style: {
-          minWidth: '250px',
+          minWidth: "250px",
         },
         success: {
           duration: 5000,
-          icon: '✅',
+          icon: "✅",
         },
         error: {
           duration: 5000,
-          icon: '❌',
+          icon: "❌",
         },
       }
     );
@@ -81,7 +90,7 @@ export function useSignUpForm() {
     {
       isFullWidth: true,
       hasMask: false,
-      id: "company",
+      id: "companyName",
       label: "Empresa",
       placeholder: "ACME inc.",
     },
