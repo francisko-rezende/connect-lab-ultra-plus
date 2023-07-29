@@ -2,6 +2,7 @@ import { Button } from "@/components/Button";
 import { Checkbox } from "@/components/Checkbox/Checkbox";
 import { CreateLocationDialog } from "@/components/CreateLocationDialog";
 import { SectionTitle } from "@/components/SectionTitle/SectionTitle";
+import { trpc } from "@/utils/trpc";
 import {
   ColumnDef,
   flexRender,
@@ -19,44 +20,6 @@ type Location = {
   longitude: number;
   installedSensorsNumber: number;
 };
-
-const locations: Location[] = [
-  {
-    id: 1,
-    name: "Campo de Milho",
-    latitude: -20.4435,
-    longitude: -54.6478,
-    installedSensorsNumber: 5,
-  },
-  {
-    id: 2,
-    name: "Vineyard",
-    latitude: 41.9028,
-    longitude: 12.4964,
-    installedSensorsNumber: 8,
-  },
-  {
-    id: 3,
-    name: "Wheat Field",
-    latitude: 47.3769,
-    longitude: 8.5417,
-    installedSensorsNumber: 3,
-  },
-  {
-    id: 4,
-    name: "Orchard",
-    latitude: 33.8563,
-    longitude: -118.2206,
-    installedSensorsNumber: 6,
-  },
-  {
-    id: 5,
-    name: "Rice Paddy",
-    latitude: 34.6937,
-    longitude: 135.5023,
-    installedSensorsNumber: 4,
-  },
-];
 
 export function Locations() {
   const columns = useMemo<ColumnDef<Location>[]>(
@@ -119,11 +82,14 @@ export function Locations() {
     []
   );
 
+  const locationsQuery = trpc.getLocations.useQuery();
+  const { data: locations } = locationsQuery;
+
   const [searchedTerm, setSearchedTerm] = useState("");
   const [rowSelection, setRowSelection] = useState({});
 
   const table = useReactTable({
-    data: locations,
+    data: locations || [],
     columns,
     getCoreRowModel: getCoreRowModel(),
     onGlobalFilterChange: setSearchedTerm,
