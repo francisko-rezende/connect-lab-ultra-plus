@@ -101,24 +101,16 @@ export const schemas = {
       }
     ),
   linkSensor: z.object({
-    deviceId: z
-      .string()
-      .nonempty(errorMessages.required)
-      .transform((value) => parseInt(value)),
-    deviceName: z.string().nonempty(errorMessages.required),
-    macAddress: z
-      .string()
-      .refine((value) => {
-        const macAddressRegex = /^([0-9A-Fa-f]{2}[:]){5}([0-9A-Fa-f]{2})$/;
+    sensorTypeId: z.string().nonempty(errorMessages.required),
+    sensorName: z.string().nonempty(errorMessages.required),
+    macAddress: z.string().refine((value) => {
+      const macAddressRegex = /^([0-9A-Fa-f]{2}[:]){5}([0-9A-Fa-f]{2})$/;
 
-        return macAddressRegex.test(value);
-      }, errorMessages.invalidMACAddress)
-      .transform((value) => value.replace(/\D/g, "")),
-    status: z
-      .enum(["true", "false"], {
-        errorMap: () => ({ message: errorMessages.required }),
-      })
-      .transform((value) => (value === "true" ? true : false)),
+      return macAddressRegex.test(value);
+    }, errorMessages.invalidMACAddress),
+    status: z.enum(["true", "false"], {
+      errorMap: () => ({ message: errorMessages.required }),
+    }),
   }),
   createLocation: z.object({
     locationName: z.string().nonempty(errorMessages.required),
