@@ -5,42 +5,19 @@ import { TextField } from "../TextField";
 import { LinkSensorForm } from "@/types/LinkSensorForm";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { schemas } from "@/lib/zod/schemas";
+import { trpc } from "@/utils/trpc";
 
 type LinkSensorDialogProps = {
   trigger: React.ReactNode;
 };
 
 export function LinkSensorDialog({ trigger }: LinkSensorDialogProps) {
-  const mockSensors = [
-    {
-      value: "1",
-      label: "Sensor de Umidade do Solo 1",
-    },
-    {
-      value: "2",
-      label: "Sensor de Temperatura 1",
-    },
-    {
-      value: "3",
-      label: "Sensor de Umidade 1",
-    },
-    {
-      value: "4",
-      label: "Sensor de Temperatura do Solo 1",
-    },
-    {
-      value: "5",
-      label: "Identificação de Agrotóxicos 1",
-    },
-    {
-      value: "6",
-      label: "Sensor de Qualidade do Ar 1",
-    },
-  ];
+  const sensorTypeQuery = trpc.sensorTypes.useQuery();
+  const { data: sensorTypes } = sensorTypeQuery;
 
   const defaultValues = {
-    device: "",
-    deviceName: undefined,
+    sensorTypeId: undefined,
+    sensorName: undefined,
     macAddress: undefined,
     status: undefined,
   };
@@ -54,10 +31,10 @@ export function LinkSensorDialog({ trigger }: LinkSensorDialogProps) {
     resolver: zodResolver(schemas.linkSensor),
   });
 
-  console.log(errors);
+  const linkSensorMutation = trpc.linkSensor.useMutation();
 
   const handleLinkSensor: SubmitHandler<LinkSensorForm> = (data) => {
-    console.log(data);
+    linkSensorMutation.mutate(data);
   };
 
   const onSubmit = handleSubmit(handleLinkSensor);
@@ -71,34 +48,36 @@ export function LinkSensorDialog({ trigger }: LinkSensorDialogProps) {
       <form className="grid gap-4" onSubmit={onSubmit}>
         <TextField
           label="Dispositivo"
-          htmlFor="device"
-          errorMessage={errors.deviceId?.message}
+          htmlFor="sensorType"
+          errorMessage={errors.sensorTypeId?.message}
         >
           <TextField.Select
-            hasError={!!errors["deviceId"]}
-            {...register("deviceId")}
+            hasError={!!errors["sensorTypeId"]}
+            defaultValue={""}
+            {...register("sensorTypeId")}
           >
-            <option selected value={""} disabled>
+            <option value={""} disabled>
               Selecione um sensor
             </option>
-            {mockSensors.map(({ label, value }) => (
-              <option key={value} value={value}>
-                {label}
-              </option>
-            ))}
+            {sensorTypes &&
+              sensorTypes.map(({ sensorTypeName, sensorTypeId }) => (
+                <option key={sensorTypeId} value={sensorTypeId}>
+                  {sensorTypeName}
+                </option>
+              ))}
           </TextField.Select>
         </TextField>
 
         <TextField
           label={"Nome"}
-          htmlFor={"deviceName"}
-          errorMessage={errors["deviceName"]?.message}
+          htmlFor={"sensorName"}
+          errorMessage={errors["sensorName"]?.message}
         >
           <TextField.Input
-            id="deviceName"
+            id="sensorName"
             type="text"
-            hasError={!!errors["deviceName"]}
-            {...register("deviceName")}
+            hasError={!!errors["sensorName"]}
+            {...register("sensorName")}
           />
         </TextField>
 
@@ -125,9 +104,10 @@ export function LinkSensorDialog({ trigger }: LinkSensorDialogProps) {
         >
           <TextField.Select
             hasError={!!errors["status"]}
+            defaultValue={""}
             {...register("status")}
           >
-            <option selected value={""} disabled>
+            <option value={""} disabled>
               Selecione o estado do sensor
             </option>
             <option value={"true"}>Ativo</option>

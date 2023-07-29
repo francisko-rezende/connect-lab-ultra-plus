@@ -4,6 +4,7 @@ import { schemas } from "@/lib/zod/schemas";
 import { prisma } from "@/lib/prisma/prismaClient";
 import * as bcrypt from "bcrypt";
 import { TRPCError } from "@trpc/server";
+import { Prisma } from "@prisma/client";
 
 export const appRouter = router({
   signUp: procedure.input(schemas.signUp).mutation(async (opts) => {
@@ -58,6 +59,34 @@ export const appRouter = router({
 
     return loggedInCompany;
   }),
+  sensorTypes: authedProcedure.query(() => {
+    return prisma.sensorType.findMany();
+  }),
+  linkSensor: authedProcedure
+    .input(schemas.linkSensor)
+    .mutation(async ({ input, ctx }) => {
+      const company = await prisma.company.findFirst({
+        where: { email: ctx.session?.user?.email! },
+      });
+
+      if (!company) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Bad request: Logged in company not found.",
+        });
+      }
+
+      const newLinkedSensorData = {
+        ...input,
+        locationId: 1,
+        sensorTypeId: Number(input.sensorTypeId),
+        status: input.status === "true" ? true : false,
+      };
+      const newLinkedSensor = await prisma.sensor.create({
+        data: newLinkedSensorData,
+      });
+      return newLinkedSensor;
+    }),
   createLocation: authedProcedure
     .input(schemas.createLocation)
     .mutation(async ({ input, ctx }) => {

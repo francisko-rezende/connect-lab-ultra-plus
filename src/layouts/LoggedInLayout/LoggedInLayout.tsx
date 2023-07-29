@@ -1,8 +1,6 @@
 import { TextField } from "@/components/TextField";
 import { trpc } from "@/utils/trpc";
-import { GetServerSidePropsContext } from "next";
-import { getServerSession } from "next-auth";
-import { signOut, useSession } from "next-auth/react";
+import { signOut } from "next-auth/react";
 import { Inter } from "next/font/google";
 import Link from "next/link";
 import { useRouter } from "next/router";

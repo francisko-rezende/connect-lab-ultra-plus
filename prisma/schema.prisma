@@ -20,7 +20,7 @@ model Company {
   password    String
   salt        String
   createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
   locations   Location[]
 }
 
@@ -30,7 +30,32 @@ model Location {
   latitude     String
   longitude    String
   createdAt    DateTime @default(now())
-  updatedAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
   companyId    Int
   company      Company  @relation(fields: [companyId], references: [companyId])
+  sensors      Sensor[]
+}
+
+model Sensor {
+  sensorId     Int        @id @default(autoincrement())
+  sensorName   String
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  macAddress   String
+  status       Boolean
+  locationId   Int
+  location     Location   @relation(fields: [locationId], references: [locationId])
+  sensorTypeId Int
+  sensorType   SensorType @relation(fields: [sensorTypeId], references: [sensorTypeId])
+}
+
+model SensorType {
+  sensorTypeId   Int      @id @default(autoincrement())
+  sensorTypeName String
+  sensorType     String
+  minRange       Int
+  maxRange       Int
+  barcode        String
+  batch          String
+  sensors        Sensor[]
 }
