@@ -87,6 +87,36 @@ export const appRouter = router({
       });
       return newLinkedSensor;
     }),
+  getLocations: authedProcedure.query(async ({ ctx }) => {
+    const userEmail = ctx.session?.user?.email;
+
+    if (!userEmail) {
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: "Unauthorized: session is invalid or has expired",
+      });
+    }
+
+    const dbLocations = await prisma.location.findMany({
+      where: { company: { email: userEmail } },
+      include: {
+        _count: {
+          select: { sensors: true },
+        },
+      },
+      orderBy: { updatedAt: "desc" },
+    });
+
+    const locations = dbLocations.map((dbLocation) => ({
+      id: dbLocation.locationId,
+      installedSensorsNumber: dbLocation._count.sensors,
+      latitude: Number(dbLocation.latitude),
+      longitude: Number(dbLocation.longitude),
+      name: dbLocation.locationName,
+    }));
+
+    return locations;
+  }),
   createLocation: authedProcedure
     .input(schemas.createLocation)
     .mutation(async ({ input, ctx }) => {
