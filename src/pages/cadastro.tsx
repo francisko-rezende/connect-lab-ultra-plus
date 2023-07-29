@@ -4,6 +4,7 @@ import { LoggedOutLayout } from "@/layouts/LoggedOutLayout";
 import { SignUp } from "@/templates/SignUp";
 import { getSession } from "next-auth/react";
 import { GetServerSideProps } from "next";
+import { redirectLoggedInUsers } from "@/utils/redirectLoggedInUsers";
 
 const SignUpPage: NextPageWithLayout = () => {
   return <SignUp />;
@@ -16,14 +17,7 @@ SignUpPage.getLayout = function getLayout(page: ReactElement) {
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const session = await getSession(ctx);
 
-  if (!!session) {
-    return {
-      redirect: {
-        destination: "/",
-        permanent: false,
-      },
-    };
-  }
+  redirectLoggedInUsers(session);
 
   return {
     props: {},
