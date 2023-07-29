@@ -6,6 +6,7 @@ import { TextField } from "../TextField";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { schemas } from "@/lib/zod/schemas";
 import { trpc } from "@/utils/trpc";
+import { useState } from "react";
 
 type CreateLocationDialogProps = {
   trigger: React.ReactNode;
@@ -18,16 +19,29 @@ export function CreateLocationDialog({ trigger }: CreateLocationDialogProps) {
     longitude: "",
   };
 
+  const [isOpen, setIsOpen] = useState(false);
+
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<CreateLocationForm>({
     defaultValues,
     resolver: zodResolver(schemas.createLocation),
   });
 
-  const mutation = trpc.createLocation.useMutation();
+  const utils = trpc.useContext();
+
+  const mutation = trpc.createLocation.useMutation({
+    onSuccess: () => {
+      utils.getLocations.invalidate();
+      setIsOpen(false);
+      reset();
+    },
+  });
+
+  console.log(isOpen);
 
   const handleCreateLocation: SubmitHandler<CreateLocationForm> = (data) =>
     mutation.mutate(data);
@@ -36,6 +50,8 @@ export function CreateLocationDialog({ trigger }: CreateLocationDialogProps) {
 
   return (
     <Dialog
+      open={isOpen}
+      setOpen={setIsOpen}
       title="Criar Local"
       subtitle="Adicionar um novo local à empresa."
       trigger={trigger}
