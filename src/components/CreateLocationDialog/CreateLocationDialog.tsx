@@ -7,6 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { schemas } from "@/lib/zod/schemas";
 import { trpc } from "@/utils/trpc";
 import { useState } from "react";
+import { toast } from "react-hot-toast";
 
 type CreateLocationDialogProps = {
   trigger: React.ReactNode;
@@ -41,10 +42,30 @@ export function CreateLocationDialog({ trigger }: CreateLocationDialogProps) {
     },
   });
 
-  console.log(isOpen);
-
   const handleCreateLocation: SubmitHandler<CreateLocationForm> = (data) =>
-    mutation.mutate(data);
+    toast.promise(
+      mutation.mutateAsync(data),
+      {
+        loading: "Processando...",
+        success: "Local registrado com sucesso!",
+        error: "Houve um erro no registro do local",
+      },
+      {
+        style: {
+          minWidth: "250px",
+        },
+        success: {
+          duration: 5000,
+          icon: "✅",
+        },
+        error: {
+          duration: 5000,
+          icon: "❌",
+        },
+      }
+    );
+
+  // mutation.mutate(data);
 
   const onSubmit = handleSubmit(handleCreateLocation);
 

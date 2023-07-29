@@ -4,6 +4,7 @@ import { signOut } from "next-auth/react";
 import { Inter } from "next/font/google";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { Toaster } from "react-hot-toast";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -101,6 +102,7 @@ export function LoggedInLayout({ children }: LoggedInLayoutProps) {
       <main className={`col-span-1 h-full w-full overflow-auto px-8 py-12`}>
         {children}
       </main>
+      <Toaster position="top-center" />
     </div>
   );
 }
