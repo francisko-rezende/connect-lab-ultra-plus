@@ -7,11 +7,11 @@ import { schemas } from "@/lib/zod/schemas";
 import { trpc } from "@/utils/trpc";
 import { toast } from "react-hot-toast";
 import { Dispatch, SetStateAction, useEffect } from "react";
-import { Location } from "@/types/Location";
+import { LocationRow } from "@/types/LocationRow";
 
 type LocationFormProps = {
   setIsOpen: Dispatch<SetStateAction<boolean>>;
-  locationData?: Location;
+  locationData?: LocationRow;
 };
 
 export function LocationForm({ setIsOpen, locationData }: LocationFormProps) {
@@ -72,8 +72,12 @@ export function LocationForm({ setIsOpen, locationData }: LocationFormProps) {
         : createLocationMutation.mutateAsync(data),
       {
         loading: "Processando...",
-        success: "Local registrado com sucesso!",
-        error: "Houve um erro no registro do local",
+        success: isEditForm
+          ? "Local atualizado com sucesso!"
+          : "Local registrado com sucesso!",
+        error: isEditForm
+          ? "Houve um erro na atualização do local"
+          : "Houve um erro no registro do local",
       },
       {
         style: {
@@ -119,8 +123,6 @@ export function LocationForm({ setIsOpen, locationData }: LocationFormProps) {
           placeholder="-21.2976"
           hasError={!!errors.latitude}
           {...register("latitude")}
-          // mask={"[{A}]00.0000"}
-          // definitions={{ A: /[+-]/ }}
         />
       </TextField>
       <TextField
@@ -134,8 +136,6 @@ export function LocationForm({ setIsOpen, locationData }: LocationFormProps) {
           placeholder="135.5678"
           hasError={!!errors.longitude}
           {...register("longitude")}
-          // mask={"[{A}0]00.0000"}
-          // definitions={{ A: /[+-]/ }}
         />
       </TextField>
       <DialogButtonGroup />
