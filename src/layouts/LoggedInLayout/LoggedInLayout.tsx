@@ -102,7 +102,7 @@ export function LoggedInLayout({ children }: LoggedInLayoutProps) {
       <main className={`col-span-1 h-full w-full overflow-auto px-8 py-12`}>
         {children}
       </main>
-      <Toaster position="top-center" />
+      <Toaster position="bottom-center" />
     </div>
   );
 }
