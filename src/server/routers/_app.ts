@@ -1,4 +1,4 @@
-import { z } from "zod";
+import * as z from "zod";
 import { authedProcedure, procedure, router } from "../trpc";
 import { schemas } from "@/lib/zod/schemas";
 import { prisma } from "@/lib/prisma/prismaClient";
@@ -117,6 +117,41 @@ export const appRouter = router({
 
     return locations;
   }),
+  deleteLocations: authedProcedure
+    .input(z.array(z.number()))
+    .mutation(async ({ input, ctx }) => {
+      const userEmail = ctx.session?.user?.email;
+
+      if (!userEmail) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "Unauthorized: session is invalid or has expired",
+        });
+      }
+
+      try {
+        await prisma.location.deleteMany({
+          where: {
+            company: {
+              email: userEmail,
+            },
+            locationId: {
+              in: input,
+            },
+          },
+        });
+      } catch (error) {
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+          if (error.code === "P2003") {
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message:
+                "Não é possível deletar locais que têm dispositivos vinculados.",
+            });
+          }
+        }
+      }
+    }),
   createLocation: authedProcedure
     .input(schemas.createLocation)
     .mutation(async ({ input, ctx }) => {
