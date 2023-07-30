@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma/prismaClient";
 import * as bcrypt from "bcrypt";
 import { TRPCError } from "@trpc/server";
 import { Prisma } from "@prisma/client";
+import { trpcSchemas } from "@/lib/zod/trpcSchemas";
 
 export const appRouter = router({
   signUp: procedure.input(schemas.signUp).mutation(async (opts) => {
@@ -152,6 +153,35 @@ export const appRouter = router({
         }
       }
     }),
+  updateLocation: authedProcedure
+    .input(trpcSchemas.updateLocation)
+    .mutation(async ({ input, ctx }) => {
+      const company = await prisma.company.findFirst({
+        where: { email: ctx.session?.user?.email! },
+      });
+
+      if (!company) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Bad request: Logged in company not found.",
+        });
+      }
+
+      const updatedLocation = {
+        locationName: input.locationName,
+        latitude: parseFloat(input.latitude),
+        longitude: parseFloat(input.longitude),
+      };
+
+      await prisma.location.update({
+        where: {
+          locationId: input.locationId,
+        },
+        data: {
+          ...updatedLocation,
+        },
+      });
+    }),
   createLocation: authedProcedure
     .input(schemas.createLocation)
     .mutation(async ({ input, ctx }) => {
@@ -169,6 +199,8 @@ export const appRouter = router({
       const newLocationData = {
         ...input,
         companyId: company.companyId,
+        latitude: parseFloat(input.latitude),
+        longitude: parseFloat(input.longitude),
       };
 
       const newLocation = prisma.location.create({ data: newLocationData });
