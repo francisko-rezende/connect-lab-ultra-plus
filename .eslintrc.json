@@ -6,6 +6,15 @@
   "rules": {
     "react/no-unknown-property": [
       1
+    ],
+    "no-console": [
+      "warn",
+      {
+        "allow": [
+          "warn",
+          "error"
+        ]
+      }
     ]
   }
 }

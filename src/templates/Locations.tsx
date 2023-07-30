@@ -1,7 +1,8 @@
 import { Button } from "@/components/Button";
 import { Checkbox } from "@/components/Checkbox/Checkbox";
-import { CreateLocationDialog } from "@/components/CreateLocationDialog";
+import { LocationDialog } from "@/components/LocationDialog";
 import { SectionTitle } from "@/components/SectionTitle/SectionTitle";
+import { trpc } from "@/utils/trpc";
 import {
   ColumnDef,
   flexRender,
@@ -9,57 +10,13 @@ import {
   getFilteredRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { Edit } from "lucide-react";
+import { Edit, Search } from "lucide-react";
 import { useMemo, useState } from "react";
-
-type Location = {
-  id: number;
-  name: string;
-  latitude: number;
-  longitude: number;
-  installedSensorsNumber: number;
-};
-
-const locations: Location[] = [
-  {
-    id: 1,
-    name: "Campo de Milho",
-    latitude: -20.4435,
-    longitude: -54.6478,
-    installedSensorsNumber: 5,
-  },
-  {
-    id: 2,
-    name: "Vineyard",
-    latitude: 41.9028,
-    longitude: 12.4964,
-    installedSensorsNumber: 8,
-  },
-  {
-    id: 3,
-    name: "Wheat Field",
-    latitude: 47.3769,
-    longitude: 8.5417,
-    installedSensorsNumber: 3,
-  },
-  {
-    id: 4,
-    name: "Orchard",
-    latitude: 33.8563,
-    longitude: -118.2206,
-    installedSensorsNumber: 6,
-  },
-  {
-    id: 5,
-    name: "Rice Paddy",
-    latitude: 34.6937,
-    longitude: 135.5023,
-    installedSensorsNumber: 4,
-  },
-];
+import { toast } from "react-hot-toast";
+import { LocationRow } from "@/types/LocationRow";
 
 export function Locations() {
-  const columns = useMemo<ColumnDef<Location>[]>(
+  const columns = useMemo<ColumnDef<LocationRow>[]>(
     () => [
       {
         id: "select",
@@ -108,10 +65,15 @@ export function Locations() {
         header: "Editar",
         cell: (info) => {
           return (
-            <button onClick={() => alert(JSON.stringify(info.row.original))}>
-              <Edit className="transition-opacity hover:opacity-60" />
-              <span className="sr-only">Editar</span>
-            </button>
+            <LocationDialog
+              locationData={info.row.original}
+              trigger={
+                <button>
+                  <Edit className="transition-opacity hover:opacity-60" />
+                  <span className="sr-only">Editar</span>
+                </button>
+              }
+            />
           );
         },
       },
@@ -119,11 +81,23 @@ export function Locations() {
     []
   );
 
+  const utils = trpc.useContext();
+
+  const deleteLocationsMutation = trpc.deleteLocations.useMutation({
+    onSuccess: () => {
+      table.resetRowSelection();
+      utils.getLocations.invalidate();
+    },
+  });
+
+  const locationsQuery = trpc.getLocations.useQuery();
+  const { data: locations } = locationsQuery;
+
   const [searchedTerm, setSearchedTerm] = useState("");
   const [rowSelection, setRowSelection] = useState({});
 
   const table = useReactTable({
-    data: locations,
+    data: locations || [],
     columns,
     getCoreRowModel: getCoreRowModel(),
     onGlobalFilterChange: setSearchedTerm,
@@ -142,30 +116,7 @@ export function Locations() {
       <div>
         <div className="mb-16 flex items-center justify-between">
           <div className="relative flex items-center">
-            <svg
-              className="absolute"
-              width="24"
-              height="24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <circle
-                cx="11"
-                cy="11.5"
-                r="6.5"
-                stroke="#9395A3"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M15.519 16.485 19.043 20"
-                stroke="#9395A3"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
+            <Search className="absolute h-5 w-5  text-slate-400" />
             <input
               className="max-w-[350px] flex-1 rounded border-none pl-8"
               type="search"
@@ -175,8 +126,42 @@ export function Locations() {
             />
           </div>
           <div className="space-x-8">
-            <Button variant={"noBorder"}>Excluir</Button>
-            <CreateLocationDialog
+            <Button
+              disabled={!Object.entries(rowSelection).length}
+              onClick={() => {
+                const idsToDelete = table
+                  .getFilteredSelectedRowModel()
+                  .rows.map((row) => row.original.id);
+
+                toast.promise(
+                  deleteLocationsMutation.mutateAsync(idsToDelete),
+                  {
+                    loading: "Processando...",
+                    success: "Conta criada!",
+                    error: (error) => {
+                      return error.message;
+                    },
+                  },
+                  {
+                    style: {
+                      minWidth: "250px",
+                    },
+                    success: {
+                      duration: 5000,
+                      icon: "✅",
+                    },
+                    error: {
+                      duration: 5000,
+                      icon: "❌",
+                    },
+                  }
+                );
+              }}
+              variant={"noBorder"}
+            >
+              Excluir
+            </Button>
+            <LocationDialog
               trigger={<Button variant={"primary"}>Novo Local</Button>}
             />
           </div>
