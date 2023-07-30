@@ -10,8 +10,9 @@ import {
   getFilteredRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { Edit } from "lucide-react";
+import { Edit, Search } from "lucide-react";
 import { useMemo, useState } from "react";
+import { toast } from "react-hot-toast";
 
 type Location = {
   id: number;
@@ -82,6 +83,14 @@ export function Locations() {
     []
   );
 
+  const utils = trpc.useContext();
+
+  const deleteLocationsMutation = trpc.deleteLocations.useMutation({
+    onSuccess: () => {
+      utils.getLocations.invalidate();
+    },
+  });
+
   const locationsQuery = trpc.getLocations.useQuery();
   const { data: locations } = locationsQuery;
 
@@ -108,30 +117,7 @@ export function Locations() {
       <div>
         <div className="mb-16 flex items-center justify-between">
           <div className="relative flex items-center">
-            <svg
-              className="absolute"
-              width="24"
-              height="24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <circle
-                cx="11"
-                cy="11.5"
-                r="6.5"
-                stroke="#9395A3"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M15.519 16.485 19.043 20"
-                stroke="#9395A3"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
+            <Search className="absolute h-5 w-5  text-slate-400" />
             <input
               className="max-w-[350px] flex-1 rounded border-none pl-8"
               type="search"
@@ -141,7 +127,40 @@ export function Locations() {
             />
           </div>
           <div className="space-x-8">
-            <Button variant={"noBorder"}>Excluir</Button>
+            <Button
+              onClick={() => {
+                const idsToDelete = table
+                  .getFilteredSelectedRowModel()
+                  .rows.map((row) => row.original.id);
+
+                toast.promise(
+                  deleteLocationsMutation.mutateAsync(idsToDelete),
+                  {
+                    loading: "Processando...",
+                    success: "Conta criada!",
+                    error: (error) => {
+                      return error.message;
+                    },
+                  },
+                  {
+                    style: {
+                      minWidth: "250px",
+                    },
+                    success: {
+                      duration: 5000,
+                      icon: "✅",
+                    },
+                    error: {
+                      duration: 5000,
+                      icon: "❌",
+                    },
+                  }
+                );
+              }}
+              variant={"noBorder"}
+            >
+              Excluir
+            </Button>
             <CreateLocationDialog
               trigger={<Button variant={"primary"}>Novo Local</Button>}
             />
