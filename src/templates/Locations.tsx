@@ -1,6 +1,6 @@
 import { Button } from "@/components/Button";
 import { Checkbox } from "@/components/Checkbox/Checkbox";
-import { CreateLocationDialog } from "@/components/CreateLocationDialog";
+import { LocationDialog } from "@/components/LocationDialog";
 import { SectionTitle } from "@/components/SectionTitle/SectionTitle";
 import { trpc } from "@/utils/trpc";
 import {
@@ -13,17 +13,10 @@ import {
 import { Edit, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "react-hot-toast";
-
-type Location = {
-  id: number;
-  name: string;
-  latitude: number;
-  longitude: number;
-  installedSensorsNumber: number;
-};
+import { LocationRow } from "@/types/LocationRow";
 
 export function Locations() {
-  const columns = useMemo<ColumnDef<Location>[]>(
+  const columns = useMemo<ColumnDef<LocationRow>[]>(
     () => [
       {
         id: "select",
@@ -72,10 +65,15 @@ export function Locations() {
         header: "Editar",
         cell: (info) => {
           return (
-            <button onClick={() => alert(JSON.stringify(info.row.original))}>
-              <Edit className="transition-opacity hover:opacity-60" />
-              <span className="sr-only">Editar</span>
-            </button>
+            <LocationDialog
+              locationData={info.row.original}
+              trigger={
+                <button>
+                  <Edit className="transition-opacity hover:opacity-60" />
+                  <span className="sr-only">Editar</span>
+                </button>
+              }
+            />
           );
         },
       },
@@ -87,6 +85,7 @@ export function Locations() {
 
   const deleteLocationsMutation = trpc.deleteLocations.useMutation({
     onSuccess: () => {
+      table.resetRowSelection();
       utils.getLocations.invalidate();
     },
   });
@@ -128,6 +127,7 @@ export function Locations() {
           </div>
           <div className="space-x-8">
             <Button
+              disabled={!Object.entries(rowSelection).length}
               onClick={() => {
                 const idsToDelete = table
                   .getFilteredSelectedRowModel()
@@ -161,7 +161,7 @@ export function Locations() {
             >
               Excluir
             </Button>
-            <CreateLocationDialog
+            <LocationDialog
               trigger={<Button variant={"primary"}>Novo Local</Button>}
             />
           </div>
