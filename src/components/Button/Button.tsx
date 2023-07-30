@@ -36,6 +36,9 @@ const buttonStyles = cva(
           "text-stone-900",
           "hover:text-stone-600",
           "border-transparent",
+          "disabled:bg-transparent",
+          "disabled:border-transparent",
+          "disabled:text-stone-600",
         ],
       },
       upperCase: {
