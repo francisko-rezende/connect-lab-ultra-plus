@@ -51,12 +51,53 @@ export const appRouter = router({
 
     return newCompany;
   }),
-  me: authedProcedure.query(({ ctx }) => {
-    const loggedInCompany = prisma.company.findFirst({
+  updateCompany: authedProcedure
+    .input(schemas.editProfile)
+    .mutation(async ({ ctx, input }) => {
+      const companyData = await prisma.company.findFirst({
+        where: {
+          email: ctx.session?.user?.email!,
+        },
+      });
+
+      if (!!input.password) {
+        const newPasswordHashed = await bcrypt.hash(
+          input.password,
+          companyData!.salt
+        );
+
+        const { cnpj, companyName, responsible, email, phone } =
+          await prisma.company.update({
+            where: { email: ctx.session?.user?.email! },
+            data: {
+              password: newPasswordHashed,
+              phone: input.phone,
+            },
+          });
+        return { cnpj, companyName, responsible, email, phone };
+      }
+
+      await prisma.company.update({
+        where: { email: ctx.session?.user?.email! },
+        data: {
+          phone: input.phone,
+        },
+      });
+    }),
+  me: authedProcedure.query(async ({ ctx }) => {
+    const companyData = await prisma.company.findFirst({
       where: {
         email: ctx.session?.user?.email!,
       },
     });
+
+    const loggedInCompany = {
+      companyName: companyData!.companyName,
+      cnpj: companyData!.cnpj,
+      responsible: companyData!.responsible,
+      email: companyData!.email,
+      phone: companyData!.phone,
+    };
 
     return loggedInCompany;
   }),
