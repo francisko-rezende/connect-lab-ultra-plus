@@ -4,7 +4,7 @@ import { TextField } from "@/components/TextField";
 import useEditProfileForm from "@/hooks/useEditProfileForm";
 
 export function Configuration() {
-  const { errors, onSubmit, register } = useEditProfileForm();
+  const { errors, onSubmit, register, isLoading } = useEditProfileForm();
 
   return (
     <>
@@ -110,7 +110,12 @@ export function Configuration() {
           </TextField>
         </div>
 
-        <Button type="submit" variant="primary" className="mt-9">
+        <Button
+          isLoading={isLoading}
+          type="submit"
+          variant="primary"
+          className="mt-9"
+        >
           Salvar
         </Button>
       </form>
