@@ -5,6 +5,7 @@ import type { AppProps } from "next/app";
 import type { AppType } from "next/app";
 import { trpc } from "../utils/trpc";
 import { SessionProvider } from "next-auth/react";
+import NextNProgress from "nextjs-progressbar";
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode;
@@ -23,6 +24,7 @@ const MyApp = (({
   return getLayout(
     <SessionProvider session={session}>
       <Component {...pageProps} />
+      <NextNProgress />
     </SessionProvider>
   );
 }) as AppType;
