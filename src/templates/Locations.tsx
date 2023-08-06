@@ -2,6 +2,7 @@ import { Button } from "@/components/Button";
 import { Checkbox } from "@/components/Checkbox/Checkbox";
 import { LocationDialog } from "@/components/LocationDialog";
 import { SectionTitle } from "@/components/SectionTitle/SectionTitle";
+import { GetLocationsOutputItem } from "@/types/GetLocationsOutputItem";
 import { trpc } from "@/utils/trpc";
 import {
   ColumnDef,
@@ -13,10 +14,9 @@ import {
 import { Edit, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "react-hot-toast";
-import { LocationRow } from "@/types/LocationRow";
 
 export function Locations() {
-  const columns = useMemo<ColumnDef<LocationRow>[]>(
+  const columns = useMemo<ColumnDef<GetLocationsOutputItem>[]>(
     () => [
       {
         id: "select",
