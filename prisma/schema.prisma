@@ -37,16 +37,26 @@ model Location {
 }
 
 model Sensor {
-  sensorId     Int        @id @default(autoincrement())
+  sensorId     Int           @id @default(autoincrement())
   sensorName   String
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
   macAddress   String
   status       Boolean
   locationId   Int
-  location     Location   @relation(fields: [locationId], references: [locationId])
+  location     Location      @relation(fields: [locationId], references: [locationId])
   sensorTypeId Int
-  sensorType   SensorType @relation(fields: [sensorTypeId], references: [sensorTypeId])
+  sensorType   SensorType    @relation(fields: [sensorTypeId], references: [sensorTypeId])
+  measurement  Measurement[]
+}
+
+model Measurement {
+  measurementId Int      @id @default(autoincrement())
+  value         Int
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  sensor        Sensor   @relation(fields: [sensorId], references: [sensorId])
+  sensorId      Int
 }
 
 model SensorType {
