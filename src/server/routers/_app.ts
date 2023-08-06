@@ -104,8 +104,54 @@ export const appRouter = router({
   sensorTypes: authedProcedure.query(() => {
     return prisma.sensorType.findMany();
   }),
+  getSensors: authedProcedure
+    .input(trpcSchemas.getSensors)
+    .query(async ({ input, ctx }) => {
+      const company = await prisma.company.findFirst({
+        where: { email: ctx.session?.user?.email! },
+      });
+
+      if (!company) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Bad request: Logged in company not found.",
+        });
+      }
+
+      const { locationId } = input;
+      const { email } = company;
+
+      const dbSensors = await prisma.sensor.findMany({
+        where: {
+          location: { locationId, company: { email } },
+        },
+      });
+
+      const formatDate = (date: Date) =>
+        new Intl.DateTimeFormat("pt-BR").format(date);
+
+      const sensors = dbSensors.map(
+        ({
+          sensorId,
+          sensorName,
+          createdAt,
+          macAddress,
+          status,
+          sensorTypeId,
+        }) => ({
+          sensorTypeId,
+          sensorId,
+          sensorName,
+          createdAt: formatDate(createdAt),
+          macAddress: macAddress,
+          status: status,
+        })
+      );
+
+      return sensors;
+    }),
   linkSensor: authedProcedure
-    .input(schemas.linkSensor)
+    .input(trpcSchemas.linkSensor)
     .mutation(async ({ input, ctx }) => {
       const company = await prisma.company.findFirst({
         where: { email: ctx.session?.user?.email! },
@@ -118,11 +164,13 @@ export const appRouter = router({
         });
       }
 
+      const { sensorData, locationId } = input;
+
       const newLinkedSensorData = {
-        ...input,
-        locationId: 1,
-        sensorTypeId: Number(input.sensorTypeId),
-        status: input.status === "true" ? true : false,
+        ...sensorData,
+        locationId,
+        sensorTypeId: Number(sensorData.sensorTypeId),
+        status: sensorData.status === "true" ? true : false,
       };
       const newLinkedSensor = await prisma.sensor.create({
         data: newLinkedSensorData,
