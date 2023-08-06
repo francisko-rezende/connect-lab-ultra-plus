@@ -1,9 +1,12 @@
+import { RetainQueryLink } from "@/components/RetainQueryLink";
 import { TextField } from "@/components/TextField";
+import { useLoadSelectedLocationFromQuery } from "@/hooks/useLoadSelectedLocationFromQuery";
 import { trpc } from "@/utils/trpc";
 import { signOut } from "next-auth/react";
 import { Inter } from "next/font/google";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { ChangeEvent, useState } from "react";
 import { Toaster } from "react-hot-toast";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -15,26 +18,35 @@ type LoggedInLayoutProps = {
 export function LoggedInLayout({ children }: LoggedInLayoutProps) {
   const router = useRouter();
   const loggedInCompanyQuery = trpc.me.useQuery();
-  const { data } = loggedInCompanyQuery;
+  const [selectedLocationId, setSelectedLocationId] = useState(0);
+  const { data: company } = loggedInCompanyQuery;
+  const locationsQuery = trpc.getLocations.useQuery();
+  const { data: locationsData } = locationsQuery;
+  useLoadSelectedLocationFromQuery({ locationsData, setSelectedLocationId });
 
   const getLinkClasses = (linkHref: string) =>
     router.pathname === linkHref
       ? "font-semibold text-blue-700"
       : "font-medium text-stone-700";
 
-  const locations = [
-    {
-      value: "1",
-      label: "Campo de soja",
-    },
-    {
-      value: "2",
-      label: "Campo de milho",
-    },
-    {
-      value: "3",
-      label: "Campo de abóbora",
-    },
+  const handleSelectedLocationChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    const selectedLocationId = parseInt(e.target.value);
+    router.replace({ query: { locationId: selectedLocationId } });
+    setSelectedLocationId(selectedLocationId);
+  };
+
+  const handleSignOut = async () => {
+    const data = await signOut({
+      redirect: false,
+    });
+    router.push(data.url);
+  };
+
+  const linksData = [
+    { href: "/", children: "Overview" },
+    { href: "/sensores", children: "Sensores" },
+    { href: "/locais", children: "Locais" },
+    { href: "/configuracoes", children: "Configurações" },
   ];
 
   return (
@@ -49,52 +61,40 @@ export function LoggedInLayout({ children }: LoggedInLayoutProps) {
               Connect Lab
             </h1>
           </Link>
-          <TextField.Select hasError={false} className="w-auto">
-            {locations.map(({ label, value }) => (
-              <option key={value} value={value}>
-                {label}
+          <TextField.Select
+            value={selectedLocationId}
+            hasError={false}
+            className="w-auto"
+            onChange={handleSelectedLocationChange}
+          >
+            <option value={0} disabled>
+              Selecione um local
+            </option>
+            {locationsData?.map(({ id, name }) => (
+              <option key={id} value={id}>
+                {name}
               </option>
             ))}
           </TextField.Select>
         </div>
       </header>
       <nav className="relative z-0 col-span-1 h-full max-w-[390px] content-baseline bg-gray-50 pl-16 pr-6 pt-12">
-        <h2 className="mb-20 text-xl font-semibold">{data?.companyName}</h2>
+        <h2 className="mb-20 text-xl font-semibold">{company?.companyName}</h2>
         <h3 className="-ml-8 mb-10 uppercase text-gray-500">Menu</h3>
         <ul className="grid gap-10">
-          <li>
-            <Link className={getLinkClasses("/")} href="/">
-              Overview
-            </Link>
-          </li>
-          <li>
-            <Link className={getLinkClasses("/sensores")} href="/sensores">
-              Sensores
-            </Link>
-          </li>
-          <li>
-            <Link className={getLinkClasses("/locais")} href="/locais">
-              Locais
-            </Link>
-          </li>
-          <li>
-            <Link
-              className={getLinkClasses("/configuracoes")}
-              href="/configuracoes"
-            >
-              Configurações
-            </Link>
-          </li>
+          {linksData.map(({ href, children }) => {
+            return (
+              <li key={href}>
+                <RetainQueryLink className={getLinkClasses(href)} href={href}>
+                  {children}
+                </RetainQueryLink>
+              </li>
+            );
+          })}
         </ul>
         <a
           className="absolute bottom-24 cursor-pointer"
-          onClick={async () => {
-            const data = await signOut({
-              redirect: false,
-              callbackUrl: "/login",
-            });
-            router.push(data.url);
-          }}
+          onClick={handleSignOut}
         >
           Logout
         </a>
