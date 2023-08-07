@@ -4,7 +4,7 @@ import { schemas } from "@/lib/zod/schemas";
 import { prisma } from "@/lib/prisma/prismaClient";
 import * as bcrypt from "bcrypt";
 import { TRPCError } from "@trpc/server";
-import { Prisma } from "@prisma/client";
+import { Prisma, PrismaClient, SensorType } from "@prisma/client";
 import { trpcSchemas } from "@/lib/zod/trpcSchemas";
 
 export const appRouter = router({
@@ -241,6 +241,62 @@ export const appRouter = router({
           }
         }
       }
+    }),
+  updateSensor: authedProcedure
+    .input(trpcSchemas.updateSensor)
+    .mutation(async ({ input, ctx }) => {
+      const userSensors = await prisma.sensor.findMany({
+        where: {
+          location: { company: { email: ctx.session?.user?.email! } },
+        },
+      });
+
+      const isUserSensor = userSensors.some(
+        ({ sensorId }) => sensorId === input.sensorId
+      );
+
+      if (!isUserSensor) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "Não é possível editar sensores de outros usuários.",
+        });
+      }
+
+      const { sensorTypeId, ...updatedSensor } = {
+        ...input.sensorData,
+        status: input.sensorData.status === "true" ? true : false,
+      };
+
+      // const transaction = await prisma.$transaction([
+      //   prisma.sensor.update({
+      //     where: { sensorId: input.sensorId },
+      //     data: {
+      //       ...updatedSensor,
+      //       sensorType: { connect: { sensorTypeId: Number(sensorTypeId) } },
+      //     },
+      //   }),
+      // ]);
+
+      await prisma.sensor.update({
+        where: { sensorId: input.sensorId },
+        data: {
+          ...updatedSensor,
+          sensorType: { connect: { sensorTypeId: Number(sensorTypeId) } },
+        },
+      });
+
+      // const sensorToUpdate = await prisma.sensor.findFirst({
+      //   where: { sensorId: input.sensorId },
+      // });
+
+      // if (Number(sensorTypeId) !== sensorToUpdate?.sensorTypeId) {
+      // prisma.sensor.update({
+      //   where: {
+      //     sensorId: input.sensorId,
+      //   },
+      //   data: { sensorType: { connect: { sensorTypeId } } },
+      // })
+      // }
     }),
   updateLocation: authedProcedure
     .input(trpcSchemas.updateLocation)

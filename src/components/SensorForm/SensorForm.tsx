@@ -60,12 +60,21 @@ export function SensorForm({ setIsOpen, sensorData }: SensorFormProps) {
     onSuccess: handleMutationSuccess,
   });
 
+  const updateSensorMutation = trpc.updateSensor.useMutation({
+    onSuccess: handleMutationSuccess,
+  });
+
   const handleLinkSensor: SubmitHandler<LinkSensorForm> = (data) => {
     toast.promise(
-      linkSensorMutation.mutateAsync({
-        locationId: parseInt(locationId),
-        sensorData: data,
-      }),
+      sensorData
+        ? updateSensorMutation.mutateAsync({
+            sensorId: sensorData.sensorId,
+            sensorData: data,
+          })
+        : linkSensorMutation.mutateAsync({
+            locationId: parseInt(locationId),
+            sensorData: data,
+          }),
       {
         loading: "Processando...",
         success: "Sensor vinculado com sucesso!",
