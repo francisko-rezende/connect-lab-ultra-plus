@@ -267,16 +267,6 @@ export const appRouter = router({
         status: input.sensorData.status === "true" ? true : false,
       };
 
-      // const transaction = await prisma.$transaction([
-      //   prisma.sensor.update({
-      //     where: { sensorId: input.sensorId },
-      //     data: {
-      //       ...updatedSensor,
-      //       sensorType: { connect: { sensorTypeId: Number(sensorTypeId) } },
-      //     },
-      //   }),
-      // ]);
-
       await prisma.sensor.update({
         where: { sensorId: input.sensorId },
         data: {
@@ -284,19 +274,6 @@ export const appRouter = router({
           sensorType: { connect: { sensorTypeId: Number(sensorTypeId) } },
         },
       });
-
-      // const sensorToUpdate = await prisma.sensor.findFirst({
-      //   where: { sensorId: input.sensorId },
-      // });
-
-      // if (Number(sensorTypeId) !== sensorToUpdate?.sensorTypeId) {
-      // prisma.sensor.update({
-      //   where: {
-      //     sensorId: input.sensorId,
-      //   },
-      //   data: { sensorType: { connect: { sensorTypeId } } },
-      // })
-      // }
     }),
   updateLocation: authedProcedure
     .input(trpcSchemas.updateLocation)
