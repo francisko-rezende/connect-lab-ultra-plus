@@ -7,11 +7,11 @@ import { schemas } from "@/lib/zod/schemas";
 import { trpc } from "@/utils/trpc";
 import { toast } from "react-hot-toast";
 import { Dispatch, SetStateAction, useEffect } from "react";
-import { LocationRow } from "@/types/LocationRow";
+import { GetLocationsOutputItem } from "@/types/GetLocationsOutputItem";
 
 type LocationFormProps = {
   setIsOpen: Dispatch<SetStateAction<boolean>>;
-  locationData?: LocationRow;
+  locationData?: GetLocationsOutputItem;
 };
 
 export function LocationForm({ setIsOpen, locationData }: LocationFormProps) {
@@ -42,9 +42,6 @@ export function LocationForm({ setIsOpen, locationData }: LocationFormProps) {
   }, []);
 
   const isEditForm = !!locationData;
-
-  if (isEditForm) {
-  }
 
   const utils = trpc.useContext();
 

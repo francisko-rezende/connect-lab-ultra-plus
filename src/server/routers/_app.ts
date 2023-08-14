@@ -1,10 +1,11 @@
+import { useMutation } from "@tanstack/react-query";
 import * as z from "zod";
 import { authedProcedure, procedure, router } from "../trpc";
 import { schemas } from "@/lib/zod/schemas";
 import { prisma } from "@/lib/prisma/prismaClient";
 import * as bcrypt from "bcrypt";
 import { TRPCError } from "@trpc/server";
-import { Prisma } from "@prisma/client";
+import { Prisma, PrismaClient, SensorType } from "@prisma/client";
 import { trpcSchemas } from "@/lib/zod/trpcSchemas";
 
 export const appRouter = router({
@@ -104,8 +105,82 @@ export const appRouter = router({
   sensorTypes: authedProcedure.query(() => {
     return prisma.sensorType.findMany();
   }),
+  deleteSensors: authedProcedure
+    .input(z.array(z.number()))
+    .mutation(async ({ input, ctx }) => {
+      const userEmail = ctx.session?.user?.email;
+
+      if (!userEmail) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "Unauthorized: session is invalid or has expired",
+        });
+      }
+
+      await prisma.sensor.updateMany({
+        where: {
+          sensorId: {
+            in: input,
+          },
+          location: {
+            company: { email: userEmail },
+          },
+        },
+        data: {
+          deletedAt: new Date(),
+          status: false,
+        },
+      });
+    }),
+  getSensors: authedProcedure
+    .input(trpcSchemas.getSensors)
+    .query(async ({ input, ctx }) => {
+      const company = await prisma.company.findFirst({
+        where: { email: ctx.session?.user?.email! },
+      });
+
+      if (!company) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Bad request: Logged in company not found.",
+        });
+      }
+
+      const { locationId } = input;
+      const { email } = company;
+
+      const dbSensors = await prisma.sensor.findMany({
+        where: {
+          deletedAt: null,
+          location: { locationId, company: { email } },
+        },
+      });
+
+      const formatDate = (date: Date) =>
+        new Intl.DateTimeFormat("pt-BR").format(date);
+
+      const sensors = dbSensors.map(
+        ({
+          sensorId,
+          sensorName,
+          createdAt,
+          macAddress,
+          status,
+          sensorTypeId,
+        }) => ({
+          sensorTypeId,
+          sensorId,
+          sensorName,
+          createdAt: formatDate(createdAt),
+          macAddress: macAddress,
+          status: status,
+        })
+      );
+
+      return sensors;
+    }),
   linkSensor: authedProcedure
-    .input(schemas.linkSensor)
+    .input(trpcSchemas.linkSensor)
     .mutation(async ({ input, ctx }) => {
       const company = await prisma.company.findFirst({
         where: { email: ctx.session?.user?.email! },
@@ -118,11 +193,13 @@ export const appRouter = router({
         });
       }
 
+      const { sensorData, locationId } = input;
+
       const newLinkedSensorData = {
-        ...input,
-        locationId: 1,
-        sensorTypeId: Number(input.sensorTypeId),
-        status: input.status === "true" ? true : false,
+        ...sensorData,
+        locationId,
+        sensorTypeId: Number(sensorData.sensorTypeId),
+        status: sensorData.status === "true" ? true : false,
       };
       const newLinkedSensor = await prisma.sensor.create({
         data: newLinkedSensorData,
@@ -193,6 +270,39 @@ export const appRouter = router({
           }
         }
       }
+    }),
+  updateSensor: authedProcedure
+    .input(trpcSchemas.updateSensor)
+    .mutation(async ({ input, ctx }) => {
+      const userSensors = await prisma.sensor.findMany({
+        where: {
+          location: { company: { email: ctx.session?.user?.email! } },
+        },
+      });
+
+      const isUserSensor = userSensors.some(
+        ({ sensorId }) => sensorId === input.sensorId
+      );
+
+      if (!isUserSensor) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "Não é possível editar sensores de outros usuários.",
+        });
+      }
+
+      const { sensorTypeId, ...updatedSensor } = {
+        ...input.sensorData,
+        status: input.sensorData.status === "true" ? true : false,
+      };
+
+      await prisma.sensor.update({
+        where: { sensorId: input.sensorId },
+        data: {
+          ...updatedSensor,
+          sensorType: { connect: { sensorTypeId: Number(sensorTypeId) } },
+        },
+      });
     }),
   updateLocation: authedProcedure
     .input(trpcSchemas.updateLocation)

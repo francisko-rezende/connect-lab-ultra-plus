@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { Dialog } from "../Dialog";
 import { LocationForm } from "../LocationForm";
-import { Location } from "@/types/Location";
+import { GetLocationsOutputItem } from "@/types/GetLocationsOutputItem";
 
 type LocationDialogProps = {
   trigger: React.ReactNode;
-  locationData?: Location;
+  locationData?: GetLocationsOutputItem;
 };
 
 export function LocationDialog({ trigger, locationData }: LocationDialogProps) {
