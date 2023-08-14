@@ -41,6 +41,7 @@ model Sensor {
   sensorName   String
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
+  deletedAt    DateTime?
   macAddress   String
   status       Boolean
   locationId   Int
@@ -54,6 +55,7 @@ model Measurement {
   measurementId Int      @id @default(autoincrement())
   value         Int
   createdAt     DateTime @default(now())
+  creationDate  DateTime @default(now()) @db.Date
   updatedAt     DateTime @updatedAt
   sensor        Sensor   @relation(fields: [sensorId], references: [sensorId])
   sensorId      Int

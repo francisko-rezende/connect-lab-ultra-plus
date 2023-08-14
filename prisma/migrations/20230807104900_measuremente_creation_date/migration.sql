@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Measurement" ADD COLUMN     "creationDate" DATE NOT NULL DEFAULT CURRENT_TIMESTAMP;
