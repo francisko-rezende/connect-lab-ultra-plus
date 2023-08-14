@@ -1,3 +1,4 @@
+import { useMutation } from "@tanstack/react-query";
 import * as z from "zod";
 import { authedProcedure, procedure, router } from "../trpc";
 import { schemas } from "@/lib/zod/schemas";
@@ -104,6 +105,33 @@ export const appRouter = router({
   sensorTypes: authedProcedure.query(() => {
     return prisma.sensorType.findMany();
   }),
+  deleteSensors: authedProcedure
+    .input(z.array(z.number()))
+    .mutation(async ({ input, ctx }) => {
+      const userEmail = ctx.session?.user?.email;
+
+      if (!userEmail) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "Unauthorized: session is invalid or has expired",
+        });
+      }
+
+      await prisma.sensor.updateMany({
+        where: {
+          sensorId: {
+            in: input,
+          },
+          location: {
+            company: { email: userEmail },
+          },
+        },
+        data: {
+          deletedAt: new Date(),
+          status: false,
+        },
+      });
+    }),
   getSensors: authedProcedure
     .input(trpcSchemas.getSensors)
     .query(async ({ input, ctx }) => {
@@ -123,6 +151,7 @@ export const appRouter = router({
 
       const dbSensors = await prisma.sensor.findMany({
         where: {
+          deletedAt: null,
           location: { locationId, company: { email } },
         },
       });
