@@ -15,10 +15,20 @@ import { Search } from "lucide-react";
 import { trpc } from "@/utils/trpc";
 import { useRouter } from "next/router";
 import { GetSensorsOutputItem } from "@/types/GetSensorsOutputItem";
+import { toast } from "react-hot-toast";
 
 export function Sensors() {
   const router = useRouter();
   const locationId = (router.query.locationId as string | undefined) || "";
+
+  const utils = trpc.useContext();
+
+  const deleteSensorsMutation = trpc.deleteSensors.useMutation({
+    onSuccess: () => {
+      table.resetRowSelection();
+      utils.getSensors.invalidate();
+    },
+  });
 
   const sensorsQuery = trpc.getSensors.useQuery(
     { locationId: parseInt(locationId) },
@@ -136,7 +146,41 @@ export function Sensors() {
             />
           </div>
           <div className="space-x-8">
-            <Button variant={"noBorder"}>Excluir</Button>
+            <Button
+              variant={"noBorder"}
+              disabled={!Object.entries(rowSelection).length}
+              onClick={() => {
+                const idsToDelete = table
+                  .getFilteredSelectedRowModel()
+                  .rows.map((row) => row.original.sensorId);
+
+                toast.promise(
+                  deleteSensorsMutation.mutateAsync(idsToDelete),
+                  {
+                    loading: "Processando...",
+                    success: "Conta criada!",
+                    error: (error) => {
+                      return error.message;
+                    },
+                  },
+                  {
+                    style: {
+                      minWidth: "250px",
+                    },
+                    success: {
+                      duration: 5000,
+                      icon: "✅",
+                    },
+                    error: {
+                      duration: 5000,
+                      icon: "❌",
+                    },
+                  }
+                );
+              }}
+            >
+              Excluir
+            </Button>
             <LinkSensorDialog
               trigger={<Button variant={"primary"}>Novo Sensor</Button>}
             />
